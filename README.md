@@ -1,2 +1,2 @@
-# spelprojekt2
-Spelprojekt i Unity
+# SpelProjekt 2
+Ett 2.5D Platformer i Unity
