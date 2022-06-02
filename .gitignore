@@ -43,6 +43,8 @@ ExportedObj/
 *.mdb
 *.opendb
 *.VC.db
+# //// Ignorerar Blender Backups
+*.blend1
 
 # Unity3D generated meta files
 *.pidb.meta
