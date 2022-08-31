@@ -53,11 +53,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
-    {
-
-    }
-
     private void Jump()
     {
         rbody.velocity = new Vector2(rbody.velocity.x * 2, jumpForce);
@@ -79,7 +74,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private bool IsGrounded()
+    public bool IsGrounded()
     {
         return Physics.CheckSphere(groundCheck.position, groundRadius, groundLayer, QueryTriggerInteraction.Ignore);
     }
