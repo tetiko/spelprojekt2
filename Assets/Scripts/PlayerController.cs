@@ -1,22 +1,24 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.InputSystem;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [HideInInspector] public bool gameOver = false, disableMovement = false;
+
+    private Animator playerAnim;
+    private AudioSource playerAudio;
+    public AudioClip jumpSound;
+
     private Rigidbody rbody; // Appliceras på PlayerGameObject i inspektorn   
 
     // ----------- Variabler för Character Horizonal Movement (X-axis) ---------
-    private float moveX;
     [Header("Movement Settings:")] // Skapar en header i inspektorn för publika inställningar
-    [Range(0f, 20f)] // Slider för att enklare ändra karaktärens hastighet i inspektorn
-    public float moveSpeed = 5.5f; // Rörelsehastigheten, går att ändra i inspektorn
+    public float moveSpeed = 20f; // Rörelsehastigheten, går att ändra i inspektorn
 
     // ------- Variabler för Character Jump (Y-axis) --------------------
-    [Range(0f, 20f)] // Skapar en slider för hopp-styrkan för att enklare ändra i inspektorn
-    public float jumpForce = 10f;
+    public float jumpForce = 80;
 
     // -------------------- Variabler för ett mindre floaty hopp --------------------
     public float fallMultiplier = 1.5f;
@@ -31,17 +33,36 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         rbody = GetComponent<Rigidbody>();
+
+        //Get the Animator component from the Player object that PlayerController is attached to, and store it in the variable playerAnim
+        playerAnim = GetComponent<Animator>();
+        //Get the Audio source compenent and store it in the playerAudio variable
+        playerAudio = GetComponent<AudioSource>();
     }
     // Update is called once per frame
     void Update()
     {
-        PlayerMove();
-        CrispJump();
+        if (Input.GetKeyDown(KeyCode.Space) && !disableMovement && IsGrounded() && !gameOver)
+        {
+            Jump();
+        }
+
+        if (!disableMovement)
+        {
+            Move();
+        }
     }
 
-    private void CrispJump()
+    void FixedUpdate()
     {
-        if (rbody.velocity.y <0)
+
+    }
+
+    private void Jump()
+    {
+        rbody.velocity = new Vector2(rbody.velocity.x * 2, jumpForce);
+
+        if (rbody.velocity.y < 0)
         {
             rbody.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
         }
@@ -51,34 +72,21 @@ public class PlayerController : MonoBehaviour
             rbody.velocity += Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
         }
 
-    }
-    // Använder Unitys nya inputsystem med Unity Events. InputActions kan ändras/läggas till genom InputAction-asset.
-    // InputAction Component läggs på PlayerObject. 
-    public void Move (InputAction.CallbackContext context)
-    {
-        moveX = context.ReadValue<Vector2>().x;
+        //set the trigger 'jump_trig' for the player object's animator
+
+        //playeranim.settrigger("jump_trig");
+        //playeraudio.playoneshot(jumpsound, 0.3f);
+
     }
 
-    public void Jump(InputAction.CallbackContext context)
-    {
-        if (context.performed && IsGrounded())
-        {
-            PlayerJump();
-        }        
-    }
-
-    private void PlayerJump()
-    {
-        rbody.velocity = new Vector2(rbody.velocity.x * 2, jumpForce);
-    }
-    
     private bool IsGrounded()
     {
         return Physics.CheckSphere(groundCheck.position, groundRadius, groundLayer, QueryTriggerInteraction.Ignore);
     }
 
-    private void PlayerMove()
+    private void Move()
     {
-        rbody.velocity = new Vector2 (moveX * moveSpeed, rbody.velocity.y);
+        Vector3 input = new Vector3(Input.GetAxis("Horizontal"), rbody.velocity.y);
+        rbody.velocity = new Vector3(input.x * moveSpeed, input.y);
     }
 }
