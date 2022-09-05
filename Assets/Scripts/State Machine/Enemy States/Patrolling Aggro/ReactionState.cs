@@ -5,15 +5,20 @@ using UnityEngine;
 public class ReactionState : MasterState
 {
     //The states that this state can transition into
-    public Attack_State attackState;
+    public AttackState attackState;
 
-    //Access the variables from the EnemyVariables file
-    EnemyVariables vars;
+    //Access external scripts
+
 
     bool stateTransition = false;
 
+    public Component currentState;
+
     public void Start()
     {
+
+
+        //stateManager = GetComponentInParent<StateManager>();
         stateManager = GetComponentInParent<StateManager>();
     }
 
@@ -28,10 +33,6 @@ public class ReactionState : MasterState
 
     //CALL THE REACT SCRIPT
 
-    public override void FixedUpdate()
-    {
-
-    }
     bool StateTransition()
     {
         stateTransition = true;

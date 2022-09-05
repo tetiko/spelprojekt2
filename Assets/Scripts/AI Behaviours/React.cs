@@ -1,37 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class React : MonoBehaviour
 {
-    //Access the global timer
-    EnemyMemory enemyMemory;
-
-    //Access the variables from the EnemyVariables file
-    EnemyVariables vars;
-
-    ReactionState reactionState;
+    //Access external scripts
+    AI_PatrollingAggro vars;
 
     public bool hasMemory = true;
 
-      // Start is called before the first frame update
+    // Start is called before the first frame update
     void Start()
     {
-        vars.enemyRb = GetComponent<Rigidbody>();
-
+        vars = GetComponent<AI_PatrollingAggro>();
         Reacting(gameObject);
     }
-    
+
     void Reacting(GameObject enemyType)
     {
-        //Memorize the player for a set amount of time
-        StartCoroutine(enemyMemory.Timer(5));
+        //Memorize the player for a set amount of time using the EnemyMemory script
+        StartCoroutine(EnemyMemory.Timer(5));
 
         //Pause enemy movement briefly before reacting
         transform.position = Vector3.zero;
 
-        if (enemyType.tag != "JumpReaction")
+        if (enemyType.tag != "Jump Reaction")
         {
             //React with a surprise jump
             vars.enemyRb.AddForce(Vector3.up * vars.jumpReactionForce, ForceMode.Impulse);

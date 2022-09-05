@@ -4,22 +4,14 @@ using UnityEngine;
 
 //Gives the enemy foward-facing vision and the ability to detect the player when it's not hidden behind obstructions
 
-public class Player_Detection_One_Dir : MonoBehaviour
+public class PlayerDetectionOneDir : MonoBehaviour
 {
-    //Access the variables from the EnemyVariables file
-    EnemyVariables vars;
+    //Access external scripts
+    AI_PatrollingAggro vars;
 
-    void Awake()
+    private void Start()
     {
-        //Check if an 'eyes' object is added to this enemy, and if not display debug message
-        if (vars.eyes != null)
-        { 
-        vars.eyes = transform.Find("eyes");
-        }
-        else
-        {
-            Debug.Log("Resolve issue: Add an 'eyes' object to " + vars.gameObject);
-        }
+        vars = GetComponent<AI_PatrollingAggro>();
     }
 
     //Check to see if the enemy can spot the player within the specified range

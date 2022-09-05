@@ -5,31 +5,32 @@ using UnityEngine;
 public class PauseState : MasterState
 {
     //The states that this state can transition into
-    public Patrolling_State patrollingState;
+    public PatrollingState patrollingState;
 
-    //Access the variables from the EnemyVariables file
-    EnemyVariables vars;
+    //Access external scripts
+    Pause pause;
 
     bool stateTransition = false;
 
-    void Awake()
-    {
-        //Get and store the enemy object - the parent object of this state
-        vars.enemyObject = transform.parent.gameObject;
-    }
+    public Component currentState;
+
     public void Start()
     {
+
+
         stateManager = GetComponentInParent<StateManager>();
 
+        pause = GetComponentInParent<Pause>();
+
         //Check if the 'Pause' script is added to the object
-        if (vars.enemyObject.GetComponent("Pause") != null)
+        if (pause != null)
         {
             //Initiate the Pause effects
-            gameObject.GetComponent<Pause>().Pausing();
+            pause.Pausing();
         }
         else
         {
-            Debug.Log("Resolve issue: Add the 'Pause' script to " + vars.enemyObject);
+            Debug.Log("Resolve issue: Add the 'Pause' script to " + gameObject);
         }
     }
 
@@ -40,11 +41,6 @@ public class PauseState : MasterState
             //Transition into the Patrolling State
             stateManager.ChangeState(patrollingState);
         }
-    }
-
-    public override void FixedUpdate()
-    {
-        //Not used in this state
     }
 
     bool StateTransition()

@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyMemory 
+public static class EnemyMemory
 {
     //Global timer coroutine
-    public IEnumerator Timer(float time)
+    static public IEnumerator Timer(float time)
     {
         yield return new WaitForSeconds(time);
 
@@ -14,7 +14,7 @@ public class EnemyMemory
         MemoryOfPlayer(hasMemory);
     }
 
-    //Return true when the memory capacity has counted down in GlobalTimer is up
+    //Return true when the memory capacity has been reached in Timer
     static public bool MemoryOfPlayer(bool hasMemory)
     {
         if (hasMemory)

@@ -11,11 +11,6 @@ public class StateManager : MonoBehaviour
         currentState?.Update();
     }
 
-    void FixedUpdate()
-    {
-        currentState?.FixedUpdate();
-    }
-
     public void ChangeState(MasterState newState)
     {
         currentState = newState;

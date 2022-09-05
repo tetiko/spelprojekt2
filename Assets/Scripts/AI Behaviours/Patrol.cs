@@ -6,15 +6,16 @@ using UnityEngine;
 
 public class Patrol : MonoBehaviour
 {   
-    //Access the variables from the EnemyVariables file
-    EnemyVariables vars;
+    //Access external scripts
+    AI_PatrollingAggro vars;
 
     //Variable for storing collisions with the player used in Patrolling_State
-    public Collision collision;
+    [HideInInspector] public GameObject col;
 
-    void Awake()
+    void Start()
     {
-        vars.enemyRb = GetComponent<Rigidbody>();
+        vars = GetComponent<AI_PatrollingAggro>();
+        col = vars.playerObject;
     }
 
     void FixedUpdate()
@@ -24,8 +25,7 @@ public class Patrol : MonoBehaviour
 
     //Go about our usual patrolling business
     public void Patrolling()
-    {   //Move in the local direction of the transform. Important since we will be rotating the enemy on collision with obstructions
-        vars.enemyDir = transform.right;
+    {   
         vars.enemyRb.MovePosition(vars.enemyRb.position + vars.enemyDir * Time.fixedDeltaTime * vars.moveSpeed);
      }
 
@@ -45,8 +45,11 @@ public class Patrol : MonoBehaviour
 
     public void OnCollisionEnter(Collision collision)
     {
+        col = collision.gameObject;
+        Debug.Log("Enemy collided with: ");
+
         //Get the object we collided with
-        if (collision.gameObject.CompareTag("Obstruction"))
+        if (col.gameObject.CompareTag("Obstruction"))
         {
             //Change direction upon collision with obstruction
             DirChange(vars.enemyDir, vars.enemyRb);
