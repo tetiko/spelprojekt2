@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class EnemyMemory
 {
-    //Global timer coroutine
+    //Global timer coroutine for enemy memories
     static public IEnumerator Timer(float time)
     {
         yield return new WaitForSeconds(time);

@@ -8,11 +8,22 @@ public class StateManager : MonoBehaviour
 
     void Update()
     {
-        currentState?.Update();
+        RunStateMachine(); 
     }
 
-    public void ChangeState(MasterState newState)
+    void RunStateMachine()
     {
-        currentState = newState;
+        MasterState nextState = currentState?.RunCurrentState();
+
+        if (nextState != null)
+        {
+            SwitchToNextState(nextState);
+        }
+        //Debug.Log("current state: " + currentState);
+    }
+
+    void SwitchToNextState(MasterState nextState)
+    {
+        currentState = nextState;
     }
 }

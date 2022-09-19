@@ -1,67 +1,104 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Transactions;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PatrollingState : MasterState
 {
     //The states that this state can transition into
     public AttackState attackState;
     public PauseState pauseState;
+    public ReactionState reactionState;
 
     //Access external scripts
     AI_PatrollingAggro vars;
     Patrol patrol;
-    React react;
     PlayerDetectionOneDir playerDetection;
 
-    bool hasMemory;
+    [HideInInspector] public bool goToPauseState = false;
 
-    public Component thisState;
+    //Bool for making onStart() run only once per state inititation
+    bool onStart = true;
 
-    public void Start()
+    private void Awake()
     {
-        //PRINTA STATE NAMN
-
-        thisState = gameObject.GetComponent<MonoBehaviour>();
-        print("State :" + thisState);
-
-        stateManager = GetComponentInParent<StateManager>();
-
         vars = GetComponentInParent<AI_PatrollingAggro>();
         patrol = GetComponentInParent<Patrol>();
-        react = GetComponentInParent<React>();
         playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
-
-        //Enable kinematic
-        vars.enemyRb.isKinematic = true;
-
-        //Get the enemy's current memory from the React script
-        hasMemory = react.hasMemory;
-
-       
     }
 
-    public override void Update()
+    //Update function for the state machine
+    public override MasterState RunCurrentState()
     {
-        //Go into the Player_Detection_One_Dir script and check if we can see the player
-        if (playerDetection.CanSeePlayer(vars.enemyDir))
+        if (onStart)
         {
-            if (EnemyMemory.MemoryOfPlayer(hasMemory))
-            {
-                //Transition to Attack state
-                stateManager.ChangeState(attackState);
-            }
+            OnStart();
+            //Debug.Log("action: " + onStart);
         }
-        //Go into the Patrol script and check if we collided with the Player
-        else if (patrol.col.CompareTag("Player"))
+        
+        //vars.patrolEnable = true;
+        //Debug.Log("StateTransition to Pause: " + StateTransition());
+        //Debug.Log("Can see player: " + playerDetection.CanSeePlayer());
+
+        //Check if we remember the player
+        if (vars.hasMemory)
         {
-            //Transition to Pause State if we did
-            stateManager.ChangeState(pauseState);
+            //Disable the Patrol script
+            vars.patrolEnable = false;
+            //Transition to Attack state
+            return attackState;
+        }
+        //Go into the PlayerDetectionOneDir script and check if we can see the player
+        else if (playerDetection.CanSeePlayer())
+        {
+            //Disable the Patrol script
+            vars.patrolEnable = false;
+            //Transition to Reaction state since we have no memory of the player
+            return reactionState;
+        }
+        //Transition to pause upon collision with player in Patrol script
+        else if (StateTransition())
+        {
+            //Disable the Patrol script
+            vars.patrolEnable = false;
+            //Reset the transition bool
+            goToPauseState = false;
+            //Transition to Pause State
+            return pauseState;
         }
         else
         {
+            //Check if the 'Pause' script is added to the object
+            if (patrol != null)
+            {
+                //Initiate the Patrol effects
+                vars.patrolEnable = true;
+            }
+            else
+            {
+                Debug.Log("Resolve issue: Add the 'Patrol' script to " + vars.enemyObject);
+            }
             //Stay in Patrolling State
-            patrol.Patrolling();
+            return this;
+        }  
+    }
+
+    
+    void OnStart()
+    {
+        //Enable kinematic
+        vars.enemyRb.isKinematic = false;
+    }
+
+    public bool StateTransition()
+    {
+        if (goToPauseState)
+        {
+            return true;
         }
+        else return false;
     }
 }

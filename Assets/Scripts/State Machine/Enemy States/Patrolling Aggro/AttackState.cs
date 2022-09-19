@@ -1,4 +1,10 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
+using static System.Collections.Specialized.BitVector32;
 
 public class AttackState : MasterState
 {
@@ -8,54 +14,60 @@ public class AttackState : MasterState
 
     //Access external scripts
     AI_PatrollingAggro vars;
-    React react;
     PlayerDetectionOneDir playerDetection;
     ChaseAttack chaseAttack;
 
-    GameObject collisionObject;
+    [HideInInspector] public bool toPauseState = false, toPatrollingState = false;
 
-    bool hasMemory;
-
-
-    public void Start()
+    void Awake()
     {
-
-
-        stateManager = GetComponentInParent<StateManager>();
-
         vars = GetComponentInParent<AI_PatrollingAggro>();
-        react = GetComponentInParent<React>();
-        Debug.Log("react component: " + react);
-        playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
         chaseAttack = GetComponentInParent<ChaseAttack>();
-
-        //Get the enemy's current memory from the React script
-        hasMemory = react.hasMemory;
+        playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
     }
 
-    public override void Update()
+    //Update function for the state machine
+    public override MasterState RunCurrentState()
     {
-        //Check if we can see the player
-        if (playerDetection.CanSeePlayer(vars.enemyDir))
+        //Transition to Pause State upon collision with player in ChaseAttack script
+        if (chaseAttack.stateSwitch == "PauseState")
+        {
+            //Debug.Log("State switch: PauseState");
+            //Disable the ChaseAttack script
+            vars.chaseAttackEnable = false;
+            //Transition to Pause State
+            return pauseState;
+        }
+        //Transition to Patrolling State upon collision with player in ChaseAttack script
+        else if (chaseAttack.stateSwitch == "PatrollingState")
+        {
+            //Debug.Log("State switch: PauseState");
+            //Disable the ChaseAttack script
+            vars.chaseAttackEnable = false;
+            //Transition to Patrolling State
+            return patrollingState;
+        }
+
+        //If we can see the player
+        if (playerDetection.CanSeePlayer())
         {
             //Stay in Attack state if the enemy can see the player
             InitiateAttack();
+            return this;
         }
-        else if (EnemyMemory.MemoryOfPlayer(hasMemory))
+        //If we remember the player (Memory timer starts during an enemy reaction in React.cs)
+        else if (vars.hasMemory)
         {
-            //Stay in Attack state if the enemy remembers the player
+            //Stay in Attack state if we remember the player
             InitiateAttack();
-        }
-        //Check if we collided with the Player
-        else if (collisionObject == GameObject.FindWithTag("Player"))
-        {
-            //Transition to Pause State if we did
-            stateManager.ChangeState(pauseState);
+            return this;
         }
         else
         {
+            //Disable the ChaseAttack script
+            vars.chaseAttackEnable = false;
             //Transition to Patrolling State
-            stateManager.ChangeState(patrollingState);
+            return patrollingState;
         }
     }
 
@@ -65,13 +77,13 @@ public class AttackState : MasterState
         if (chaseAttack != null)
         {
             //Initiate the attack
-            chaseAttack.Attack();
+            vars.chaseAttackEnable = true;
             //Move in the local direction of the transform
             vars.enemyDir = transform.right;
         }
         else
         {
-            Debug.Log("Resolve issue: Add the 'ChaseAttack' script to " + gameObject);
+            Debug.Log("Resolve issue: Add the 'ChaseAttack' script to " + vars.enemyObject);
         }
     }
 }

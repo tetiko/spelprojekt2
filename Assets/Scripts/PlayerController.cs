@@ -51,6 +51,11 @@ public class PlayerController : MonoBehaviour
         {
             Move();
         }
+
+        if (IsGrounded())
+        {
+            disableMovement = false;
+        }
     }
 
     private void Jump()

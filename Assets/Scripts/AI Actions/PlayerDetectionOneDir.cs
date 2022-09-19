@@ -15,13 +15,13 @@ public class PlayerDetectionOneDir : MonoBehaviour
     }
 
     //Check to see if the enemy can spot the player within the specified range
-    public bool CanSeePlayer(Vector3 enemyDir)
+    public bool CanSeePlayer()
     {
         bool val = false;
         float castDist = vars.aggroRange;
 
         //Check in which direction the enemy is looking, and set the direction for the linecast accordingly
-        if (enemyDir.x < 1)
+        if (vars.enemyDir.x < 1)
         {
             castDist = -vars.aggroRange;
         }

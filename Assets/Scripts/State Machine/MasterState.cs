@@ -4,7 +4,9 @@ using UnityEngine;
 
 public abstract class MasterState : MonoBehaviour
 {
-    protected StateManager stateManager;
-
-    public abstract void Update();
+    protected virtual void Start()
+    {
+        //Debug.Log("base start");
+    }
+    public abstract MasterState RunCurrentState();
 }

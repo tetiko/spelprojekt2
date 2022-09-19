@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ReactionState : MasterState
 {
@@ -8,40 +10,86 @@ public class ReactionState : MasterState
     public AttackState attackState;
 
     //Access external scripts
+    AI_PatrollingAggro vars;
+    React react;
+    PlayerDetectionOneDir playerDetection;
 
+    [HideInInspector] public bool goToAttackState = false;
 
-    bool stateTransition = false;
+    //Bool for making onStart() run only once per state inititation
+    public bool onStart = true;
 
-    public Component currentState;
-
-    public void Start()
+    void Awake()
     {
+        vars = GetComponentInParent<AI_PatrollingAggro>();
+        react = GetComponentInParent<React>();
+        playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
 
-
-        //stateManager = GetComponentInParent<StateManager>();
-        stateManager = GetComponentInParent<StateManager>();
     }
 
-    public override void Update()
+    //Update function for the state machine
+    public override MasterState RunCurrentState()
     {
+        Debug.Log("vars.reactEnable: " + vars.reactEnable);
+        
+
+
+        //if (onStart)
+        //{
+            Debug.Log("onStart: " + onStart);
+            OnStart();
+        //}
+
+        playerDetection.CanSeePlayer();
+
         if (StateTransition())
         {
+            //Disable the React script
+            vars.reactEnable = false;
+            //Reset state transition
+            goToAttackState = false;
             //Transition into the Attack State
-            stateManager.ChangeState(attackState);
+            return attackState;
+        }
+        else
+        {
+            //Stay in Reaction State
+            return this;
         }
     }
 
-    //CALL THE REACT SCRIPT
+   
+    void OnStart()
+    {
+        //onStart = true;
+
+        //Check if the 'React' script is added to the object
+        if (react != null)
+        {
+            //Initiate the React effects
+            
+            vars.reactEnable = true;
+
+            if (onStart && vars.reactEnable)
+            {
+                //Reset the action variable to only call the function once
+                //onStart = false;
+            }
+        }
+        else
+        {
+            Debug.Log("Resolve issue: Add the 'React' script to " + vars.enemyObject);
+        }
+
+
+    }
 
     bool StateTransition()
     {
-        stateTransition = true;
-
-        if (stateTransition)
+        if (goToAttackState)
         {
             return true;
         }
         else return false;
     }
-
 }
