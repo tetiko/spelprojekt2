@@ -26,11 +26,11 @@ public class PlayerDetectionOneDir : MonoBehaviour
             castDist = -vars.aggroRange;
         }
 
-        //Make the enemy eyes the cast point for the linecast at the parameter distance
+        //Make the enemy eyes the cast point for the linecast at the parameter distance LayerMask.NameToLayer("Action")
         Vector3 endPos = vars.eyes.position + Vector3.right * castDist;
 
         //Cast a line from the enemy in the Action layer
-        Physics.Linecast(vars.eyes.position, endPos, out RaycastHit hit, 1 << LayerMask.NameToLayer("Action"));
+        Physics.Linecast(vars.eyes.position, endPos, out RaycastHit hit, vars.detectionLayers);
 
         //Check to see if we hit something in the Action layer mask
         if (hit.collider != null)

@@ -8,32 +8,39 @@ public class PauseState : MasterState
 {
     //The states that this state can transition into
     public PatrollingState patrollingState;
+    public AttackState attackState;
 
     //Access external scripts
     AI_PatrollingAggro vars;
     Pause pause;
-    
+    PlayerDetectionOneDir playerDetection;
+
     [HideInInspector] public bool goToPatrollingState = false;
 
     //Bool for making onStart() run only once per state inititation
-    bool onStart = true;
+    bool executed = false;
+
+    public bool goToAttackState = false;
 
     void Awake()
     {
         vars = GetComponentInParent<AI_PatrollingAggro>();
         pause = GetComponentInParent<Pause>();
+        playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
     }
 
     //Update function for the state machine
     public override MasterState RunCurrentState()
     {
-        //if (onStart)
-        //{
+        if (!executed)
+        {
             OnStart();
-        //}
+        }
+
+        playerDetection.CanSeePlayer();
 
         //Debug.Log("StateTransition to Patrolling: " + StateTransition());
-        if (StateTransition())
+        if (goToPatrollingState)
         { 
             //Disable the Pause script
             vars.pauseEnable = false;
@@ -42,6 +49,16 @@ public class PauseState : MasterState
             //Transition into the Patrolling State
             return patrollingState;
         }
+        //Transition to Attack State upon collision with player in Pause script
+        else if (goToAttackState)
+        {
+            //Disable the Pause script
+            vars.pauseEnable = false;
+            //Reset the transition bool
+            goToAttackState = false;
+            //Transition to Attack State
+            return attackState;
+        }
         else
         {
             //Stay in Pause State
@@ -49,7 +66,6 @@ public class PauseState : MasterState
         }
     }
 
-   
     void OnStart()
     {
         
@@ -64,15 +80,6 @@ public class PauseState : MasterState
             Debug.Log("Resolve issue: Add the 'Pause' script to " + vars.enemyObject);
         }
         //Reset the action variable to only call the function once
-        onStart = false;
-    }
-
-    public bool StateTransition()
-    {
-        if (goToPatrollingState)
-        {
-            return true;
-        }
-        else return false;
+        executed = false;
     }
 }

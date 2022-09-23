@@ -8,12 +8,13 @@ public class Pause : MonoBehaviour
     //Access external scripts
     AI_PatrollingAggro vars;
     PauseState pauseState;
-    PlayerController pcScript;
+    PlayerManager playerManager;
 
     private void Awake()
     {
         vars = GetComponent<AI_PatrollingAggro>();
         pauseState = GetComponentInChildren<PauseState>();
+        playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
     }
 
     // OnEnable is called upon enabling a component
@@ -23,42 +24,14 @@ public class Pause : MonoBehaviour
         vars.currentAction = GetType();
         //Debug.Log("Class: " + GetType());
 
-        //Get the player object
-        pcScript = vars.playerObject.GetComponentInChildren<PlayerController>();
-
-        //Get the direction of the player for later use in force direction
-        vars.playerDir = vars.playerObject.transform.right;
-
         //Go directly into the Pausing function
         Pausing();
     }
 
     public void Pausing()
     {
-        //Pause enemy movement briefly before changing direction
-        //vars.stopEnemy = true;
-
-        ////Disable collision on the enemy when colliding with player to avoid any forcing affecting the enemy
-        //vars.enemyRb.isKinematic = true;
-
-        //Go into the Player Controller script and disable movement before applying force (SET IN PLAYER STATE INSTEAD)
-        pcScript.disableMovement = true;
-        //Debug.Log("disableMovement: " + pcScript.disableMovement);
-
-        //Get the force power to apply
-        float force = Mathf.Sign(vars.playerDir.x * -1) * vars.impactForceX;
-        //Debug.Log("Mathf.Sign(playerDir.x): " + Mathf.Sign(vars.playerDir.x * vars.impactForceX) * -1);
-
-        //Debug.Log("force.x: " + force);
-
-        if (pcScript.disableMovement == true)
-        {
-            //Push the player away
-            vars.playerRb.AddForce(force, vars.impactForceY, 0, ForceMode.Impulse);
-        }
-
         //Pause, change direction and initiate state transition
-        StartCoroutine(StateTransition(2f));
+        StartCoroutine(StateTransition(vars.pauseDuration));
     }
 
     IEnumerator StateTransition(float time)
@@ -66,9 +39,25 @@ public class Pause : MonoBehaviour
         yield return new WaitForSeconds(time);
         //Debug.Log("Dir change in coroutine");
         //Change direction and...
-        DirChange(vars.enemyDir, vars.enemyRb);
+        //DirChange(vars.enemyDir, vars.enemyRb);
+
         //... state transition
         pauseState.goToPatrollingState = true;
+    }
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        if (vars.pauseEnable)
+        {
+            //On collision with player
+            if (collision.gameObject.CompareTag("Player"))
+            {
+                //Push the player away
+                playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
+                //... initiate state transition to pause state
+                pauseState.goToAttackState = true;
+            }
+        }
     }
 
     //Change direction of the Rigidbody

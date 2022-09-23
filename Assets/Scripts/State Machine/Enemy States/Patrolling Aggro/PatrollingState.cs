@@ -21,7 +21,7 @@ public class PatrollingState : MasterState
     [HideInInspector] public bool goToPauseState = false;
 
     //Bool for making onStart() run only once per state inititation
-    bool onStart = true;
+    bool executed = false;
 
     private void Awake()
     {
@@ -33,15 +33,10 @@ public class PatrollingState : MasterState
     //Update function for the state machine
     public override MasterState RunCurrentState()
     {
-        if (onStart)
+        if (!executed)
         {
             OnStart();
-            //Debug.Log("action: " + onStart);
         }
-        
-        //vars.patrolEnable = true;
-        //Debug.Log("StateTransition to Pause: " + StateTransition());
-        //Debug.Log("Can see player: " + playerDetection.CanSeePlayer());
 
         //Check if we remember the player
         if (vars.hasMemory)
@@ -54,13 +49,14 @@ public class PatrollingState : MasterState
         //Go into the PlayerDetectionOneDir script and check if we can see the player
         else if (playerDetection.CanSeePlayer())
         {
+            //Debug.Log("Patrolling State to Reaction State");
             //Disable the Patrol script
             vars.patrolEnable = false;
             //Transition to Reaction state since we have no memory of the player
             return reactionState;
         }
         //Transition to pause upon collision with player in Patrol script
-        else if (StateTransition())
+        else if (goToPauseState)
         {
             //Disable the Patrol script
             vars.patrolEnable = false;
@@ -86,19 +82,10 @@ public class PatrollingState : MasterState
         }  
     }
 
-    
     void OnStart()
     {
         //Enable kinematic
-        vars.enemyRb.isKinematic = false;
-    }
-
-    public bool StateTransition()
-    {
-        if (goToPauseState)
-        {
-            return true;
-        }
-        else return false;
+        //vars.enemyRb.isKinematic = false;
+        executed = true;
     }
 }

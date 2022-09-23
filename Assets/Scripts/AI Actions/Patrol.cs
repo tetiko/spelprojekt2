@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-//Gives the enemy the ability to patrol between obstacles and chosen parameters
+//Gives the enemy the ability to patrol between obstacles (and chosen parameters (coming soon))
 
 public class Patrol : MonoBehaviour
 {   
     //Access external scripts
     AI_PatrollingAggro vars;
     PatrollingState patrollingState;
+    PlayerManager playerManager;
 
     //Variable for storing collisions with the player used in Patrolling_State
     [HideInInspector] public GameObject col = null;
@@ -18,6 +19,7 @@ public class Patrol : MonoBehaviour
     {
         vars = GetComponent<AI_PatrollingAggro>();
         patrollingState = GetComponentInChildren<PatrollingState>();
+        playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
     }
 
     // OnEnable is called upon enabling a component
@@ -50,19 +52,30 @@ public class Patrol : MonoBehaviour
 
             if (col.CompareTag("Player"))
             {
-                //Change direction and...
-                DirChange(vars.enemyDir, vars.enemyRb);
+                //StartCoroutine(PushAndWait(1f));
+                //Push the player and...
+                playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
                 //... initiate state transition to pause state
                 patrollingState.goToPauseState = true;
             }
 
             if (col.CompareTag("Obstruction"))
             {
+                vars.enemyRb.isKinematic = false;
                 //Change direction upon collision with obstruction
                 DirChange(vars.enemyDir, vars.enemyRb);
             }
         }
     }
+
+    //IEnumerator PushAndWait(float time)
+    //{
+    //    //Push the player away
+
+    //    yield return new WaitForSeconds(time);
+    //    //Change direction and...
+    //    DirChange(vars.enemyDir, vars.enemyRb);
+    //}
 
     //Change direction of the Rigidbody
     public void DirChange(Vector3 enemyDir, Rigidbody enemyRb)

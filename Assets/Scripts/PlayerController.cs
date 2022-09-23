@@ -5,11 +5,18 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [HideInInspector] public bool gameOver = false, disableMovement = false;
+    AI_PatrollingAggro vars;
+
+    public bool gameOver = false, disableMovement = false;
 
     private Animator playerAnim;
     private AudioSource playerAudio;
     public AudioClip jumpSound;
+
+    [Header("Default forces applied to player upon taking damage:")]
+    public float impactForceX;
+    public float impactForceY;
+
 
     private Rigidbody rbody; // Appliceras på PlayerGameObject i inspektorn   
 
@@ -38,6 +45,7 @@ public class PlayerController : MonoBehaviour
         playerAnim = GetComponent<Animator>();
         //Get the Audio source compenent and store it in the playerAudio variable
         playerAudio = GetComponent<AudioSource>();
+
     }
     // Update is called once per frame
     void Update()
@@ -52,10 +60,7 @@ public class PlayerController : MonoBehaviour
             Move();
         }
 
-        if (IsGrounded())
-        {
-            disableMovement = false;
-        }
+        //Debug.Log("IsGrounded(): " + IsGrounded()); 
     }
 
     private void Jump()
@@ -76,7 +81,6 @@ public class PlayerController : MonoBehaviour
 
         //playeranim.settrigger("jump_trig");
         //playeraudio.playoneshot(jumpsound, 0.3f);
-
     }
 
     public bool IsGrounded()
@@ -88,5 +92,10 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 input = new Vector3(Input.GetAxis("Horizontal"), rbody.velocity.y);
         rbody.velocity = new Vector3(input.x * moveSpeed, input.y);
+    }
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(groundCheck.position, groundRadius);
     }
 }

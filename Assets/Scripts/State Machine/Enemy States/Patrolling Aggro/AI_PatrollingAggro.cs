@@ -4,6 +4,8 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using UnityEditor.UIElements;
+using TMPro;
 
 
 //Add this script to the enemy game object to give it the desired behaviours
@@ -37,20 +39,25 @@ public class AI_PatrollingAggro : MonoBehaviour
     public GameObject enemyObject;
     public Rigidbody enemyRb;
 
+    [Header("Layers where enemy can detect objects")]
+    public LayerMask detectionLayers;
+
     //Enemy: Patrolling Aggro Settings
     [Header("Settings for this enemy")]
     public Transform eyes;
-    public float moveSpeed = 10;
-    public float impactForceX = 20;
-    public float impactForceY = 20;
-    public float chaseSpeed = 20;
-    public float aggroRange = 30;
-    public float jumpReactionForce = 20;
+    public float moveSpeed = 10f;
+    public float chaseSpeed = 20f;
+    public float aggroRange = 30f;
+    public float jumpReactionForce = 20f;
+    public float pauseDuration = 1f;
+    public float memoryCapacity = 5f;
+    public bool defaultPushForces = true;
+    [Header("Push Forces (Overriden if Default Push Forces is checked)")]
+    public float impactForceX;
+    public float impactForceY;
     public bool hasMemory = false;
 
-    //public bool stopEnemy;
-
-    [HideInInspector] public Vector3 enemyDir, playerDir;
+    [HideInInspector] public Vector3 enemyDir;
     [HideInInspector] public PlayerController pcScript;
 
     //Current state and action for debugging
@@ -58,10 +65,10 @@ public class AI_PatrollingAggro : MonoBehaviour
     public Type currentAction;
 
     //Bools for enabling and disabling actions
-    public bool chaseAttackEnable;
-    public bool patrolEnable;
-    public bool pauseEnable;
-    public bool reactEnable;
+    [HideInInspector] public bool chaseAttackEnable;
+    [HideInInspector] public bool patrolEnable;
+    [HideInInspector] public bool pauseEnable;
+    [HideInInspector] public bool reactEnable;
 
 
     void Awake()
@@ -74,8 +81,7 @@ public class AI_PatrollingAggro : MonoBehaviour
     }
 
     void Start()
-    {
-        
+    { 
         //Disable action scripts
         patrolEnable = GetComponent<Patrol>().enabled = false;
         pauseEnable = GetComponent<Pause>().enabled = false;

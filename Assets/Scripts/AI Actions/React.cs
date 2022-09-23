@@ -20,7 +20,7 @@ public class React : MonoBehaviour
     {
         //Get the name of this action
         vars.currentAction = GetType();
-        Debug.Log("Class: " + GetType());
+        //Debug.Log("Class: " + GetType());
 
         //Go directly into the Reacting function
         Reacting(gameObject);
@@ -31,7 +31,7 @@ public class React : MonoBehaviour
         //Debug.Log("enemyType: " + enemyType.tag);
         //Memorize the player for a set amount of time using the EnemyMemory script
         vars.hasMemory = true;
-        StartCoroutine(EnemyMemory.Timer(5));
+        StartCoroutine(EnemyMemory.Timer(vars.memoryCapacity));
 
         if (enemyType.tag == "Jump Reaction")
         {

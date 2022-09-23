@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -17,32 +18,27 @@ public class ReactionState : MasterState
     [HideInInspector] public bool goToAttackState = false;
 
     //Bool for making onStart() run only once per state inititation
-    public bool onStart = true;
+    bool executed = false;
 
     void Awake()
     {
         vars = GetComponentInParent<AI_PatrollingAggro>();
         react = GetComponentInParent<React>();
         playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
-
     }
 
     //Update function for the state machine
     public override MasterState RunCurrentState()
     {
-        Debug.Log("vars.reactEnable: " + vars.reactEnable);
-        
-
-
-        //if (onStart)
-        //{
-            Debug.Log("onStart: " + onStart);
+        //Debug.Log("vars.reactEnable: " + vars.reactEnable);
+        if (!executed)
+        {
             OnStart();
-        //}
+        }
 
         playerDetection.CanSeePlayer();
 
-        if (StateTransition())
+        if (goToAttackState)
         {
             //Disable the React script
             vars.reactEnable = false;
@@ -57,12 +53,9 @@ public class ReactionState : MasterState
             return this;
         }
     }
-
    
     void OnStart()
     {
-        //onStart = true;
-
         //Check if the 'React' script is added to the object
         if (react != null)
         {
@@ -70,26 +63,11 @@ public class ReactionState : MasterState
             
             vars.reactEnable = true;
 
-            if (onStart && vars.reactEnable)
-            {
-                //Reset the action variable to only call the function once
-                //onStart = false;
-            }
+            executed = false;
         }
         else
         {
             Debug.Log("Resolve issue: Add the 'React' script to " + vars.enemyObject);
         }
-
-
-    }
-
-    bool StateTransition()
-    {
-        if (goToAttackState)
-        {
-            return true;
-        }
-        else return false;
     }
 }

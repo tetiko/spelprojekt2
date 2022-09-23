@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,17 +8,22 @@ using UnityEngine;
 public class ChaseAttack : MonoBehaviour
 {
     //Access external scripts
-    AI_PatrollingAggro vars;
-    //AttackState attackState;
+    public AI_PatrollingAggro vars;
+    AttackState attackState;
+    PlayerManager playerManager;
+
+    [HideInInspector] public bool disableEnemyMovement = false;
 
     //Variable for storing collisions with the player used in Patrolling_State
     [HideInInspector] public GameObject col = null;
-    [HideInInspector] public string stateSwitch = null;
+    
 
     void Awake()
     {
         vars = GetComponent<AI_PatrollingAggro>();
-        //attackState = GetComponentInChildren<AttackState>();
+        attackState = GetComponentInChildren<AttackState>();
+        //Get the player manager component
+        playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
     }
 
     // OnEnable is called upon enabling a component
@@ -30,7 +36,10 @@ public class ChaseAttack : MonoBehaviour
 
     void FixedUpdate()
     {
-        Attack();
+        if (!disableEnemyMovement)
+        {
+            Attack();
+        }
     }
 
     public void Attack()
@@ -49,36 +58,43 @@ public class ChaseAttack : MonoBehaviour
             //If we collided with player
             if (col.CompareTag("Player"))
             {
-                //The enemy is struck with a sudden case of Amnesia
-                vars.hasMemory = false;
-                //Switch to pause state
-                //Debug.Log("ChaseAttack collision with Player");
-                stateSwitch = "PauseState";
+                //Disable collision on the enemy when colliding with player to avoid any forcing affecting the enemy
+                //vars.enemyRb.isKinematic = true;
 
+             
+                //Push the player away
+                playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
+
+                //The enemy is struck with a sudden case of Amnesia
+                //vars.hasMemory = false;
+                //Switch to Pause state
+                attackState.goToPauseState = true;
+                //Debug.Log("ChaseAttack collision with Player");
             }
             //If we collided with Obstruction
             if (col.CompareTag("Obstruction"))
             {
                 //The enemy is struck with a sudden case of Amnesia
                 vars.hasMemory = false;
-                //Switch Patrolling state
-                Debug.Log("ChaseAttack collision with Obstruction");
-                stateSwitch = "PatrollingState";
+                //Change direction upon collision with obstruction
+                DirChange(vars.enemyDir, vars.enemyRb);
+                //Switch to Patrolling state
+                attackState.goToPatrollingState = true;
+                //Debug.Log("ChaseAttack collision with Obstruction"); 
             }
         }
-
     }
 
     //Change direction of the Rigidbody
-    //public void DirChange(Vector3 enemyDir, Rigidbody enemyRb)
-    //{
-    //    if (Mathf.Sign(enemyDir.x) > 0)
-    //    {
-    //        enemyRb.rotation = Quaternion.AngleAxis(180, Vector3.up);
-    //    }
-    //    else
-    //    {
-    //        enemyRb.rotation = Quaternion.AngleAxis(0, Vector3.up);
-    //    }
-    //}
+    public void DirChange(Vector3 enemyDir, Rigidbody enemyRb)
+    {
+        if (Mathf.Sign(enemyDir.x) > 0)
+        {
+            enemyRb.rotation = Quaternion.AngleAxis(180, Vector3.up);
+        }
+        else
+        {
+            enemyRb.rotation = Quaternion.AngleAxis(0, Vector3.up);
+        }
+    }
 }

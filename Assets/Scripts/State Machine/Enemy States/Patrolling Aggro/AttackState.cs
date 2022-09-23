@@ -17,7 +17,7 @@ public class AttackState : MasterState
     PlayerDetectionOneDir playerDetection;
     ChaseAttack chaseAttack;
 
-    [HideInInspector] public bool toPauseState = false, toPatrollingState = false;
+    [HideInInspector] public bool goToPauseState = false, goToPatrollingState = false;
 
     void Awake()
     {
@@ -29,21 +29,26 @@ public class AttackState : MasterState
     //Update function for the state machine
     public override MasterState RunCurrentState()
     {
+        
         //Transition to Pause State upon collision with player in ChaseAttack script
-        if (chaseAttack.stateSwitch == "PauseState")
+        if (goToPauseState)
         {
-            //Debug.Log("State switch: PauseState");
+            
             //Disable the ChaseAttack script
             vars.chaseAttackEnable = false;
+            //Reset state transition
+            goToPauseState = false;
             //Transition to Pause State
             return pauseState;
         }
         //Transition to Patrolling State upon collision with player in ChaseAttack script
-        else if (chaseAttack.stateSwitch == "PatrollingState")
+        else if (goToPatrollingState)
         {
             //Debug.Log("State switch: PauseState");
             //Disable the ChaseAttack script
             vars.chaseAttackEnable = false;
+            //Reset state transition
+            goToPatrollingState = false;
             //Transition to Patrolling State
             return patrollingState;
         }
@@ -58,6 +63,7 @@ public class AttackState : MasterState
         //If we remember the player (Memory timer starts during an enemy reaction in React.cs)
         else if (vars.hasMemory)
         {
+            Debug.Log("Has memory in Attack State");
             //Stay in Attack state if we remember the player
             InitiateAttack();
             return this;
