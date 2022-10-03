@@ -19,7 +19,7 @@ public class StateManager : MonoBehaviour
         {
             SwitchToNextState(nextState);
         }
-        //Debug.Log("current state: " + currentState);
+        Debug.Log("current state: " + currentState);
     }
 
     void SwitchToNextState(MasterState nextState)

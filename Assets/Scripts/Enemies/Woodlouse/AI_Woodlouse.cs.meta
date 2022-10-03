@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 430e5ccfeddd13b4bb768706ac397dba
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - playerObject: {fileID: 5960932863272818210, guid: d08f7dda80b0b1f42ba667e2ffb4190c, type: 3}
+  - eyes: {instanceID: 0}
+  - enemyRb: {instanceID: 0}
+  - playerRb: {instanceID: 0}
+  - pcScript: {instanceID: 0}
+  - stateNames: {instanceID: 0}
+  - actions: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
