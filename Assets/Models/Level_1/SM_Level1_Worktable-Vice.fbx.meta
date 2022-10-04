@@ -9,7 +9,12 @@ ModelImporter:
   - first:
       74: -8347421036684794739
     second: ViceMotion|ArmatureAction
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Baked
+    second: {fileID: 2100000, guid: f916fe07cf91a344b8140972dd6e3e79, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
