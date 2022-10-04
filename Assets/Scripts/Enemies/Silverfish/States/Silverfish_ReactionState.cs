@@ -5,17 +5,17 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ReactionState : MasterState
+public class Silverfish_ReactionState : MasterState
 {
     //The states that this state can transition into
-    public AttackState attackState;
+    public Silverfish_AttackState silverfish_AttackState;
 
     //Access external scripts
     AI_Silverfish vars;
-    React react;
+    Silverfish_React react;
     PlayerDetectionOneDir playerDetection;
 
-    [HideInInspector] public bool goToAttackState = false;
+    [HideInInspector] public bool goTo_Silverfish_AttackState = false;
 
     //Bool for making onStart() run only once per state inititation
     bool executed = false;
@@ -23,7 +23,7 @@ public class ReactionState : MasterState
     void Awake()
     {
         vars = GetComponentInParent<AI_Silverfish>();
-        react = GetComponentInParent<React>();
+        react = GetComponentInParent<Silverfish_React>();
         playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
     }
 
@@ -48,14 +48,14 @@ public class ReactionState : MasterState
 
         playerDetection.CanSeePlayer();
 
-        if (goToAttackState)
+        if (goTo_Silverfish_AttackState)
         {
             //Disable the React script
             vars.reactEnable = false;
             //Reset state transition
-            goToAttackState = false;
+            goTo_Silverfish_AttackState = false;
             //Transition into the Attack State
-            return attackState;
+            return silverfish_AttackState;
         }
         else
         {

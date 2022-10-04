@@ -22,7 +22,7 @@ public class Woodlouse_React : MonoBehaviour
         vars.currentAction = GetType();
         Debug.Log("Class: " + GetType());
 
-        //Go directly into the Reacting function
+        //Go directly into the Reacting functionq
         Reacting(gameObject);
     }
 

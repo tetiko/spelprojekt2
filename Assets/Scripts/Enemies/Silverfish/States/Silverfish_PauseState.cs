@@ -4,28 +4,29 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PauseState : MasterState
+public class Silverfish_PauseState : MasterState
 {
     //The states that this state can transition into
-    public PatrollingState patrollingState;
-    public AttackState attackState;
+    public Silverfish_PatrollingState Silverfish_PatrollingState;
+    public Silverfish_AttackState Silverfish_AttackState;
 
     //Access external scripts
     AI_Silverfish vars;
-    Pause pause;
+    Silverfish_Pause pause;
     PlayerDetectionOneDir playerDetection;
 
-    [HideInInspector] public bool goToPatrollingState = false;
+    [HideInInspector] public bool goToS_ilverfish_PatrollingState = false;
+    [HideInInspector] public bool goTo_Silverfish_AttackState = false;
 
     //Bool for making onStart() run only once per state inititation
     bool executed = false;
 
-    public bool goToAttackState = false;
+    
 
     void Awake()
     {
         vars = GetComponentInParent<AI_Silverfish>();
-        pause = GetComponentInParent<Pause>();
+        pause = GetComponentInParent<Silverfish_Pause>();
         playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
     }
 
@@ -50,24 +51,24 @@ public class PauseState : MasterState
         playerDetection.CanSeePlayer();
 
         //Debug.Log("StateTransition to Patrolling: " + StateTransition());
-        if (goToPatrollingState)
+        if (goToS_ilverfish_PatrollingState)
         { 
             //Disable the Pause script
             vars.pauseEnable = false;
             //Reset state transition
-            goToPatrollingState = false;
+            goToS_ilverfish_PatrollingState = false;
             //Transition into the Patrolling State
-            return patrollingState;
+            return Silverfish_PatrollingState;
         }
         //Transition to Attack State upon collision with player in Pause script
-        else if (goToAttackState)
+        else if (goTo_Silverfish_AttackState)
         {
             //Disable the Pause script
             vars.pauseEnable = false;
             //Reset the transition bool
-            goToAttackState = false;
+            goTo_Silverfish_AttackState = false;
             //Transition to Attack State
-            return attackState;
+            return Silverfish_AttackState;
         }
         else
         {

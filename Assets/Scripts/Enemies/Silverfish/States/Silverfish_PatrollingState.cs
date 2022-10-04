@@ -6,19 +6,19 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PatrollingState : MasterState
+public class Silverfish_PatrollingState : MasterState
 {
     //The states that this state can transition into
-    public AttackState attackState;
-    public PauseState pauseState;
-    public ReactionState reactionState;
+    public Silverfish_AttackState silverfish_AttackState;
+    public Silverfish_PauseState silverfish_PauseState;
+    public Silverfish_ReactionState silverfish_ReactionState;
 
     //Access external scripts
     AI_Silverfish vars;
-    Patrol patrol;
+    Silverfish_Patrol patrol;
     PlayerDetectionOneDir playerDetection;
 
-    [HideInInspector] public bool goToPauseState = false;
+    [HideInInspector] public bool goTo_Silverfish_PauseState = false;
 
     //Bool for making onStart() run only once per state inititation
     bool executed = false;
@@ -26,7 +26,7 @@ public class PatrollingState : MasterState
     private void Awake()
     {
         vars = GetComponentInParent<AI_Silverfish>();
-        patrol = GetComponentInParent<Patrol>();
+        patrol = GetComponentInParent<Silverfish_Patrol>();
         playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
     }
 
@@ -44,7 +44,7 @@ public class PatrollingState : MasterState
             //Disable the Patrol script
             vars.patrolEnable = false;
             //Transition to Attack state
-            return attackState;
+            return silverfish_AttackState;
         }
         //Go into the PlayerDetectionOneDir script and check if we can see the player
         else if (playerDetection.CanSeePlayer())
@@ -53,17 +53,17 @@ public class PatrollingState : MasterState
             //Disable the Patrol script
             vars.patrolEnable = false;
             //Transition to Reaction state since we have no memory of the player
-            return reactionState;
+            return silverfish_ReactionState;
         }
         //Transition to pause upon collision with player in Patrol script
-        else if (goToPauseState)
+        else if (goTo_Silverfish_PauseState)
         {
             //Disable the Patrol script
             vars.patrolEnable = false;
             //Reset the transition bool
-            goToPauseState = false;
+            goTo_Silverfish_PauseState = false;
             //Transition to Pause State
-            return pauseState;
+            return silverfish_PauseState;
         }
         else
         {

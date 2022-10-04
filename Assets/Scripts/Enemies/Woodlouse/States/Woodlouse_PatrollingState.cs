@@ -58,6 +58,7 @@ public class Woodlouse_PatrollingState : MasterState
         //Transition to pause upon collision with player in Patrol script
         else if (goTo_Woodlouse_PauseState)
         {
+            Debug.Log("Patrolling to Pause state");
             //Disable the Patrol script
             vars.patrolEnable = false;
             //Reset the transition bool

@@ -39,10 +39,10 @@ public class AI_Woodlouse : MonoBehaviour
 
     //Enemy settings
     [Header("Settings for this enemy")]
-    public float moveSpeed = 10f;
+    public float moveSpeed = 0.7f;
     public float pauseDuration = 1f;
-    public float chaseSpeed = 20f;
-    public float jumpReactionForce = 20f;
+    public float chaseSpeed = 6f;
+    public float jumpReactionForce = 2f;
     public float memoryCapacity = 5f;
     public float obsTurnDist = 1f;
     public bool defaultPushForces = true;

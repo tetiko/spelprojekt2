@@ -5,11 +5,11 @@ using UnityEngine;
 
 //Gives the enemy the ability to patrol between obstacles (and chosen parameters (coming soon))
 
-public class Patrol : MonoBehaviour
+public class Silverfish_Patrol : MonoBehaviour
 {   
     //Access external scripts
     AI_Silverfish vars;
-    PatrollingState patrollingState;
+    Silverfish_PatrollingState silverfish_PatrollingState;
     PlayerManager playerManager;
 
     //Variable for storing collisions with the player used in Patrolling_State
@@ -18,7 +18,7 @@ public class Patrol : MonoBehaviour
     private void Awake()
     {
         vars = GetComponent<AI_Silverfish>();
-        patrollingState = GetComponentInChildren<PatrollingState>();
+        silverfish_PatrollingState = GetComponentInChildren<Silverfish_PatrollingState>();
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
     }
 
@@ -56,7 +56,7 @@ public class Patrol : MonoBehaviour
                 //Push the player and...
                 playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
                 //... initiate state transition to pause state
-                patrollingState.goToPauseState = true;
+                silverfish_PatrollingState.goTo_Silverfish_PauseState = true;
             }
 
             if (col.CompareTag("Obstruction"))

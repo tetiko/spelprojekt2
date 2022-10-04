@@ -5,14 +5,12 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class ChaseAttack : MonoBehaviour
+public class Silverfish_ChaseAttack : MonoBehaviour
 {
     //Access external scripts
     AI_Silverfish vars;
-    AttackState attackState;
+    Silverfish_AttackState silverfish_AttackState;
     PlayerManager playerManager;
-
-    [HideInInspector] public bool disableEnemyMovement = false;
 
     //Variable for storing collisions with the player used in Patrolling_State
     [HideInInspector] public GameObject col = null;
@@ -20,7 +18,7 @@ public class ChaseAttack : MonoBehaviour
     void Awake()
     {
         vars = GetComponent<AI_Silverfish>();
-        attackState = GetComponentInChildren<AttackState>();
+        silverfish_AttackState = GetComponentInChildren<Silverfish_AttackState>();
         //Get the player manager component
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
     }
@@ -30,15 +28,12 @@ public class ChaseAttack : MonoBehaviour
     {
         //Get the name of this action
         vars.currentAction = GetType();
-        Debug.Log("Class: " + GetType());
+        //Debug.Log("Class: " + GetType());
     }
 
     void FixedUpdate()
     {
-        if (!disableEnemyMovement)
-        {
             Attack();
-        }
     }
 
     public void Attack()
@@ -69,7 +64,7 @@ public class ChaseAttack : MonoBehaviour
                     playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
                     //The enemy is struck with a sudden case of Amnesia
                     vars.hasMemory = false;
-                    //Change direction upon collision with obstruction
+                    //Change direction upon collision with the player
                     DirChange(vars.enemyDir, vars.enemyRb);
                     //Switch to Patrolling state after waiting for the direction change
                     StartCoroutine(StateTransitionToPatrol(0.05f));
@@ -79,15 +74,12 @@ public class ChaseAttack : MonoBehaviour
                     //Push the player away
                     playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
 
-                    //The enemy is struck with a sudden case of Amnesia
-                    //vars.hasMemory = false;
-
                     //Switch to Pause state
-                    attackState.goToPauseState = true;
+                    silverfish_AttackState.goTo_Silverfish_PauseState = true;
                     //Debug.Log("ChaseAttack collision with Player");
                 }
-
             }
+
             //If we collided with Obstruction
             if (col.CompareTag("Obstruction"))
             {
@@ -106,7 +98,7 @@ public class ChaseAttack : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
         //State transition
-        attackState.goToPatrollingState = true;
+        silverfish_AttackState.goTo_Silverfish_PatrollingState = true;
     }
 
     //Change direction of the Rigidbody

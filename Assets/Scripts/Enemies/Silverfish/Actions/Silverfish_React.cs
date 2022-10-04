@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class React : MonoBehaviour
+public class Silverfish_React : MonoBehaviour
 {
     //Access external scripts
     AI_Silverfish vars;
-    ReactionState reactionState;
+    Silverfish_ReactionState silverfish_ReactionState;
 
     private void Awake()
     {
         vars = GetComponent<AI_Silverfish>();
-        reactionState = GetComponentInChildren<ReactionState>();
+        silverfish_ReactionState = GetComponentInChildren<Silverfish_ReactionState>();
     }
 
     // OnEnable is called upon enabling a component
@@ -20,7 +20,7 @@ public class React : MonoBehaviour
     {
         //Get the name of this action
         vars.currentAction = GetType();
-        Debug.Log("Class: " + GetType());
+        //Debug.Log("Class: " + GetType());
 
         //Go directly into the Reacting function
         Reacting(gameObject);
@@ -48,6 +48,6 @@ public class React : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
         //state transition
-        reactionState.goToAttackState = true;
+        silverfish_ReactionState.goTo_Silverfish_AttackState = true;
     }
 }

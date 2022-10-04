@@ -24,7 +24,7 @@ public class PlayerManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ResetPush();
+        //ResetPush();
     }
 
     public void PushPlayer(bool defaultPushForces, GameObject forceSource, float customXForce, float customYForce)
@@ -32,6 +32,9 @@ public class PlayerManager : MonoBehaviour
         //Disable movement and set velocity to zero to stop player velocity from affecting the push force
         pcScript.disableMovement = true;
         playerRb.velocity = Vector3.zero;
+
+        //Minimum amount of time until movement can be enabled again
+        StartCoroutine(DisableMovement(0.05f));
 
         //Get the rigidbody of the force source if it has one and make it kinematic during impact
         enemyRb = forceSource.GetComponent<Rigidbody>();
@@ -65,21 +68,39 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    void ResetPush()
+    IEnumerator DisableMovement(float time)
     {
-        if (!pcScript.IsGrounded() && pcScript.disableMovement == true)
-        {
-            //Debug.Log("In air");
-            forceAdded = true;
-        }
+        //Wait a minimum amount of time before movement can be enabled
+        yield return new WaitForSeconds(time);
+        //Change direction and...
+        forceAdded = true;
+    }
+    //void ResetPush()
+    //{
+    //    if (!pcScript.IsGrounded() && pcScript.disableMovement == true)
+    //    {
+            
+    //    }
 
-        if (pcScript.IsGrounded() && forceAdded == true)
+    //    //if (pcScript.IsGrounded() && forceAdded == true)
+    //    //{
+
+    //    //}
+    //}
+
+    void OnCollisionEnter(Collision collision)
+    {
+        GameObject colObject = collision.gameObject;
+        LayerMask colMask = collision.gameObject.layer;
+        //Enable movement again after the player lands again or collides with an obstruction
+        if (forceAdded && colObject.CompareTag("Obstruction") || forceAdded && colMask == LayerMask.NameToLayer("Ground"))
         {
-            //Debug.Log("Landed after push");
+            //Reset push
             playerRb.velocity = Vector3.zero;
             pcScript.disableMovement = false;
             enemyRb.isKinematic = false;
             forceAdded = false;
+            //Debug.Log("Landed after push");
         }
     }
 

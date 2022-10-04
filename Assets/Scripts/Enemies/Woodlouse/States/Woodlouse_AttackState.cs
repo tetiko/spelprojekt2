@@ -36,13 +36,14 @@ public class Woodlouse_AttackState : MasterState
             vars.chaseAttackEnable = false;
             //Reset state transition
             goTo_Woodlouse_PauseState = false;
+            //Debug.Log("State switch: goTo_Woodlouse_PauseState!!!!!!!!!!!!!!!");
             //Transition to Pause State
             return woodlouse_PauseState;
         }
         //Transition to Patrolling State upon collision with player in ChaseAttack script
-        else if (goTo_Woodlouse_PatrollingState)
+        if (goTo_Woodlouse_PatrollingState)
         {
-            //Debug.Log("State switch: woodlouse_PauseState");
+            //Debug.Log("State switch: woodlouse_PatrollingState!!!!!!!!!!!!!!!");
             //Disable the ChaseAttack script
             vars.chaseAttackEnable = false;
             //Reset state transition
@@ -59,13 +60,13 @@ public class Woodlouse_AttackState : MasterState
             return this;
         }
         //If we remember the player (Memory timer starts during an enemy reaction in React.cs)
-        //else if (vars.hasMemory)
-        //{
-        //    Debug.Log("Using memory in Attack State");
-        //    //Stay in Attack state if we remember the player
-        //    InitiateAttack();
-        //    return this;
-        //}
+        else if (vars.hasMemory)
+        {
+            Debug.Log("Using memory in Attack State");
+            //Stay in Attack state if we remember the player
+            InitiateAttack();
+            return this;
+        }
         else
         {
             //Disable the ChaseAttack script
@@ -82,8 +83,6 @@ public class Woodlouse_AttackState : MasterState
         {
             //Initiate the attack
             vars.chaseAttackEnable = true;
-            //Move in the local direction of the transform
-            vars.enemyDir = transform.right;
         }
         else
         {

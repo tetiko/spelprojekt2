@@ -6,23 +6,24 @@ using UnityEngine;
 using UnityEngine.UI;
 using static System.Collections.Specialized.BitVector32;
 
-public class AttackState : MasterState
+public class Silverfish_AttackState : MasterState
 {
     //The states that this state can transition into
-    public PatrollingState patrollingState;
-    public PauseState pauseState;
+    public Silverfish_PatrollingState silverfish_PatrollingState;
+    public Silverfish_PauseState silverfish_PauseState;
 
     //Access external scripts
     AI_Silverfish vars;
     PlayerDetectionOneDir playerDetection;
-    ChaseAttack chaseAttack;
+    Silverfish_ChaseAttack chaseAttack;
 
-    [HideInInspector] public bool goToPauseState = false, goToPatrollingState = false;
+    [HideInInspector] public bool goTo_Silverfish_PauseState = false;
+    [HideInInspector] public bool goTo_Silverfish_PatrollingState = false;
 
     void Awake()
     {
         vars = GetComponentInParent<AI_Silverfish>();
-        chaseAttack = GetComponentInParent<ChaseAttack>();
+        chaseAttack = GetComponentInParent<Silverfish_ChaseAttack>();
         playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
     }
 
@@ -30,29 +31,38 @@ public class AttackState : MasterState
     public override MasterState RunCurrentState()
     {
         //Transition to Pause State upon collision with player in ChaseAttack script
-        if (goToPauseState)
+        if (goTo_Silverfish_PauseState)
         {
+            Debug.Log("State switch: silverfish_PauseState");
+
             //Disable the ChaseAttack script
             vars.chaseAttackEnable = false;
             //Reset state transition
-            goToPauseState = false;
+            goTo_Silverfish_PauseState = false;
             //Transition to Pause State
-            return pauseState;
+            return silverfish_PauseState;
         }
         //Transition to Patrolling State upon collision with player in ChaseAttack script
-        else if (goToPatrollingState)
+        else if (goTo_Silverfish_PatrollingState)
         {
-            //Debug.Log("State switch: PauseState");
+            //Debug.Log("State switch: silverfish_PatrollingState");
             //Disable the ChaseAttack script
             vars.chaseAttackEnable = false;
             //Reset state transition
-            goToPatrollingState = false;
+            goTo_Silverfish_PatrollingState = false;
             //Transition to Patrolling State
-            return patrollingState;
+            return silverfish_PatrollingState;
         }
 
-        //If we can see or remember the player
-        if (playerDetection.CanSeePlayer() || vars.hasMemory)
+
+        //If we can see or remember the player !!!!!!!!!!!!!!!!!!!!!!!!!!
+        if (playerDetection.CanSeePlayer())
+        {
+            //Stay in Attack state
+            InitiateAttack();
+            return this;
+        }
+        else if (vars.hasMemory)
         {
             //Stay in Attack state
             InitiateAttack();
@@ -71,7 +81,7 @@ public class AttackState : MasterState
             //Disable the ChaseAttack script
             vars.chaseAttackEnable = false;
             //Transition to Patrolling State
-            return patrollingState;
+            return silverfish_PatrollingState;
         }
     }
 

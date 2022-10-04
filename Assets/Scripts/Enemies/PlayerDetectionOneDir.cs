@@ -22,11 +22,10 @@ public class PlayerDetectionOneDir : MonoBehaviour
         //Move in the local direction of the transform. Important since we will be rotating the enemy on collision with obstructions
         enemyDir = gameObject.transform.right.normalized;
     }
-    //Check to see if the enemy can spot the player within the specified range
+    //Check to see if the enemy can spot the playqer within the specified range
     public bool CanSeePlayer()
     {
         bool val = false;
-
 
         float castDist = aggroRange;
 

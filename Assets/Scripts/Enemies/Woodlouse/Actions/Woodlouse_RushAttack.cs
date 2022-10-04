@@ -84,9 +84,8 @@ public class Woodlouse_RushAttack : MonoBehaviour
 
                     //Switch to Pause state
                     woodlouse_AttackState.goTo_Woodlouse_PauseState = true;
-                    //Debug.Log("ChaseAttack collision with Player");
+                    Debug.Log("ChaseAttack collision with Player");
                 }
-
             }
             //If we collided with Obstruction
             if (col.CompareTag("Obstruction"))

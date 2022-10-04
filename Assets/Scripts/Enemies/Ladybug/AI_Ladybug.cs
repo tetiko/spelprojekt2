@@ -8,7 +8,6 @@ using UnityEditor.UIElements;
 using TMPro;
 
 //Add this script to the enemy game object to give it the desired behaviours
-//When attached to the enemy object all the required behaviours will be automatically added
 
 //States are added manually to child objects of the enemy object
 
@@ -19,6 +18,7 @@ using TMPro;
 
 //StateManager must be added manually to the main enemy object
 
+//When this script is attached to the enemy object the below actions will be automagically added
 //The required actions for this AI:
 [RequireComponent(typeof(Ladybug_Patrol))]
 [RequireComponent(typeof(Ladybug_Pause))]

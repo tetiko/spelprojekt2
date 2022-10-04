@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class Pause : MonoBehaviour
+public class Silverfish_Pause : MonoBehaviour
 {
     //Access external scripts
     AI_Silverfish vars;
-    PauseState pauseState;
+    Silverfish_PauseState silverfish_PauseState;
     PlayerManager playerManager;
 
     private void Awake()
     {
         vars = GetComponent<AI_Silverfish>();
-        pauseState = GetComponentInChildren<PauseState>();
+        silverfish_PauseState = GetComponentInChildren<Silverfish_PauseState>();
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
     }
 
@@ -22,7 +22,7 @@ public class Pause : MonoBehaviour
     {
         //Get the name of this action
         vars.currentAction = GetType();
-        Debug.Log("Class: " + GetType());
+        //Debug.Log("Class: " + GetType());
 
         //Go directly into the Pausing function
         Pausing();
@@ -42,7 +42,7 @@ public class Pause : MonoBehaviour
         //DirChange(vars.enemyDir, vars.enemyRb);
 
         //... state transition
-        pauseState.goToPatrollingState = true;
+        silverfish_PauseState.goToS_ilverfish_PatrollingState = true;
     }
 
     public void OnCollisionEnter(Collision collision)
@@ -55,7 +55,7 @@ public class Pause : MonoBehaviour
                 //Push the player away
                 playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
                 //... initiate state transition to pause state
-                pauseState.goToAttackState = true;
+                silverfish_PauseState.goTo_Silverfish_AttackState = true;
             }
         }
     }

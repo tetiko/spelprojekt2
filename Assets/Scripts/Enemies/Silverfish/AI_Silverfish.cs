@@ -8,24 +8,24 @@ using UnityEditor.UIElements;
 using TMPro;
 
 //Add this script to the enemy game object to give it the desired behaviours
-//When attached to the enemy object all the required behaviours will be automatically added
 
 //States are added manually to child objects of the enemy object
 
 //The required states for this AI:
 
-//AttackState
-//PatrollingState
-//ReactionState
-//PauseState
+//Silverfish_AttackState
+//Silverfish_PatrollingState
+//Silverfish_ReactionState
+//Silverfish_PauseState
 
 //StateManager must be added manually to the main enemy object
 
+//When this script is attached to the enemy object the below actions will be automagically added
 //The required actions for this AI:
-[RequireComponent(typeof(ChaseAttack))]
-[RequireComponent(typeof(Patrol))]
-[RequireComponent(typeof(React))]
-[RequireComponent(typeof(Pause))]
+[RequireComponent(typeof(Silverfish_ChaseAttack))]
+[RequireComponent(typeof(Silverfish_Patrol))]
+[RequireComponent(typeof(Silverfish_React))]
+[RequireComponent(typeof(Silverfish_Pause))]
 [RequireComponent(typeof(PlayerDetectionOneDir))]
 
 public class AI_Silverfish : MonoBehaviour
@@ -38,16 +38,11 @@ public class AI_Silverfish : MonoBehaviour
     [HideInInspector] public GameObject enemyObject;
     [HideInInspector] public Rigidbody enemyRb;
 
-    [Header("Layers where enemy can detect objects")]
-    public LayerMask detectionLayers;
-
     //Enemy: Patrolling Aggro Settings
     [Header("Settings for this enemy")]
-    public Transform eyes;
-    public float moveSpeed = 10f;
-    public float chaseSpeed = 20f;
-    public float aggroRange = 30f;
-    public float jumpReactionForce = 20f;
+    public float moveSpeed = 1f;
+    public float chaseSpeed = 2f;
+    public float jumpReactionForce = 5f;
     public float pauseDuration = 1f;
     public float memoryCapacity = 5f;
     public float obsTurnDist = 1f;
@@ -84,10 +79,10 @@ public class AI_Silverfish : MonoBehaviour
     void Start()
     { 
         //Disable action scripts
-        patrolEnable = GetComponent<Patrol>().enabled = false;
-        pauseEnable = GetComponent<Pause>().enabled = false;
-        reactEnable = GetComponent<React>().enabled = false;
-        chaseAttackEnable = GetComponent<ChaseAttack>().enabled = false;
+        patrolEnable = GetComponent<Silverfish_Patrol>().enabled = false;
+        pauseEnable = GetComponent<Silverfish_Pause>().enabled = false;
+        reactEnable = GetComponent<Silverfish_React>().enabled = false;
+        chaseAttackEnable = GetComponent<Silverfish_ChaseAttack>().enabled = false;
     }
 
     void Update()
@@ -110,10 +105,10 @@ public class AI_Silverfish : MonoBehaviour
         }
 
         //Dynamically enable/disable actions from the state scripts
-        GetComponent<Patrol>().enabled = patrolEnable;
-        GetComponent<Pause>().enabled = pauseEnable;
-        GetComponent<React>().enabled = reactEnable;
-        GetComponent<ChaseAttack>().enabled = chaseAttackEnable;
+        GetComponent<Silverfish_Patrol>().enabled = patrolEnable;
+        GetComponent<Silverfish_Pause>().enabled = pauseEnable;
+        GetComponent<Silverfish_React>().enabled = reactEnable;
+        GetComponent<Silverfish_ChaseAttack>().enabled = chaseAttackEnable;
     }
 
     //Debug: Display the current state and action above the enemy
