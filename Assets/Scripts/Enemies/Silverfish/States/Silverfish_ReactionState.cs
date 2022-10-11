@@ -17,9 +17,6 @@ public class Silverfish_ReactionState : MasterState
 
     [HideInInspector] public bool goTo_Silverfish_AttackState = false;
 
-    //Bool for making onStart() run only once per state inititation
-    bool executed = false;
-
     void Awake()
     {
         vars = GetComponentInParent<AI_Silverfish>();
@@ -31,20 +28,8 @@ public class Silverfish_ReactionState : MasterState
     public override MasterState RunCurrentState()
     {
         //Debug.Log("vars.reactEnable: " + vars.reactEnable);
-        if (!executed)
-        {
-            OnStart();
-        }
 
-        //Reset the executed variable to only call OnStart() once
-        //if (vars.reactEnable == true)
-        //{
-        //    executed = true;
-        //}
-        //else
-        //{
-        //    executed = false;
-        //}
+        OnStart();
 
         playerDetection.CanSeePlayer();
 

@@ -16,6 +16,7 @@ public class Silverfish_AttackState : MasterState
     AI_Silverfish vars;
     PlayerDetectionOneDir playerDetection;
     Silverfish_ChaseAttack chaseAttack;
+    CanRotate canRotate;
 
     [HideInInspector] public bool goTo_Silverfish_PauseState = false;
     [HideInInspector] public bool goTo_Silverfish_PatrollingState = false;
@@ -25,6 +26,7 @@ public class Silverfish_AttackState : MasterState
         vars = GetComponentInParent<AI_Silverfish>();
         chaseAttack = GetComponentInParent<Silverfish_ChaseAttack>();
         playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
+        canRotate = GetComponentInParent<CanRotate>();
     }
 
     //Update function for the state machine
@@ -33,7 +35,7 @@ public class Silverfish_AttackState : MasterState
         //Transition to Pause State upon collision with player in ChaseAttack script
         if (goTo_Silverfish_PauseState)
         {
-            Debug.Log("State switch: silverfish_PauseState");
+            //Debug.Log("State switch: silverfish_PauseState");
 
             //Disable the ChaseAttack script
             vars.chaseAttackEnable = false;
@@ -54,28 +56,22 @@ public class Silverfish_AttackState : MasterState
             return silverfish_PatrollingState;
         }
 
-
-        //If we can see or remember the player !!!!!!!!!!!!!!!!!!!!!!!!!!
-        if (playerDetection.CanSeePlayer())
+        //If we can see or remember the player
+        if (playerDetection.CanSeePlayer() && !canRotate.rotate)
         {
             //Stay in Attack state
             InitiateAttack();
             return this;
         }
+
+        //If we remember the player(Memory timer starts during an enemy reaction in React.cs)
         else if (vars.hasMemory)
         {
-            //Stay in Attack state
+            Debug.Log("Using memory in Attack State");
+            //Stay in Attack state if we remember the player
             InitiateAttack();
             return this;
         }
-        //If we remember the player (Memory timer starts during an enemy reaction in React.cs)
-        //else if (vars.hasMemory)
-        //{
-        //    Debug.Log("Using memory in Attack State");
-        //    //Stay in Attack state if we remember the player
-        //    InitiateAttack();
-        //    return this;
-        //}
         else
         {
             //Disable the ChaseAttack script

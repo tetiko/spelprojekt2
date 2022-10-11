@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -9,20 +10,27 @@ public class Silverfish_Pause : MonoBehaviour
     AI_Silverfish vars;
     Silverfish_PauseState silverfish_PauseState;
     PlayerManager playerManager;
+    CanRotate canRotate;
+
+    Type previousAction;
 
     private void Awake()
     {
         vars = GetComponent<AI_Silverfish>();
         silverfish_PauseState = GetComponentInChildren<Silverfish_PauseState>();
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
+        canRotate = GetComponent<CanRotate>();
+
     }
 
     // OnEnable is called upon enabling a component
     void OnEnable()
     {
+        //Get the previous action
+        previousAction = vars.currentAction;
         //Get the name of this action
         vars.currentAction = GetType();
-        //Debug.Log("Class: " + GetType());
+        Debug.Log("Class: " + GetType());
 
         //Go directly into the Pausing function
         Pausing();
@@ -37,12 +45,26 @@ public class Silverfish_Pause : MonoBehaviour
     IEnumerator StateTransition(float time)
     {
         yield return new WaitForSeconds(time);
-        //Debug.Log("Dir change in coroutine");
-        //Change direction and...
-        //DirChange(vars.enemyDir, vars.enemyRb);
+        
+        //Check if we came from ChaseAttack
+        if (previousAction.ToString() != "Silverfish_ChaseAttack")
+        {
+            //... if not, rotate and...
+            if (!canRotate.rotate)
+            {
+                canRotate.rotate = true;
+                canRotate.getTargetRotation = true;
+            }
+            //... state transition to patrol
+            silverfish_PauseState.goTo_Silverfish_PatrollingState = true;
+        }
+        //if we did come from ChaseAttack, go to attack state again
+        else
+        {
+            silverfish_PauseState.goTo_Silverfish_AttackState = true;
 
-        //... state transition
-        silverfish_PauseState.goToS_ilverfish_PatrollingState = true;
+        }
+        
     }
 
     public void OnCollisionEnter(Collision collision)
@@ -55,21 +77,8 @@ public class Silverfish_Pause : MonoBehaviour
                 //Push the player away
                 playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
                 //... initiate state transition to pause state
-                silverfish_PauseState.goTo_Silverfish_AttackState = true;
+                //silverfish_PauseState.goTo_Silverfish_AttackState = true;
             }
-        }
-    }
-
-    //Change direction of the Rigidbody
-    public void DirChange(Vector3 enemyDir, Rigidbody enemyRb)
-    {
-        if (Mathf.Sign(enemyDir.x) > 0)
-        {
-            enemyRb.rotation = Quaternion.AngleAxis(180, Vector3.up);
-        }
-        else
-        {
-            enemyRb.rotation = Quaternion.AngleAxis(0, Vector3.up);
         }
     }
 }

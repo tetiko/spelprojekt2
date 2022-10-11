@@ -22,11 +22,13 @@ using TMPro;
 
 //When this script is attached to the enemy object the below actions will be automagically added
 //The required actions for this AI:
+[RequireComponent(typeof(PlayerDetectionOneDir))]
+[RequireComponent(typeof(CanRotate))]
 [RequireComponent(typeof(Silverfish_ChaseAttack))]
 [RequireComponent(typeof(Silverfish_Patrol))]
 [RequireComponent(typeof(Silverfish_React))]
 [RequireComponent(typeof(Silverfish_Pause))]
-[RequireComponent(typeof(PlayerDetectionOneDir))]
+
 
 public class AI_Silverfish : MonoBehaviour
 {
@@ -91,7 +93,7 @@ public class AI_Silverfish : MonoBehaviour
         currentState = GetComponent<StateManager>().currentState;
 
         //Move in the local direction of the transform. Important since we will be rotating the enemy on collision with obstructions
-        enemyDir = gameObject.transform.right.normalized;
+        enemyDir = gameObject.transform.forward.normalized;
         //Debug.Log("enemyDir :" + enemyDir);
 
         //Determine if the enemy remembers the player or not

@@ -32,12 +32,14 @@ public class PlayerManager : MonoBehaviour
         //Disable movement and set velocity to zero to stop player velocity from affecting the push force
         pcScript.disableMovement = true;
         playerRb.velocity = Vector3.zero;
+        playerRb.useGravity = false;
 
         //Minimum amount of time until movement can be enabled again
         StartCoroutine(DisableMovement(0.05f));
 
         //Get the rigidbody of the force source if it has one and make it kinematic during impact
         enemyRb = forceSource.GetComponent<Rigidbody>();
+
         if (enemyRb != null)
         {
             enemyRb.isKinematic = true;
@@ -72,21 +74,11 @@ public class PlayerManager : MonoBehaviour
     {
         //Wait a minimum amount of time before movement can be enabled
         yield return new WaitForSeconds(time);
-        //Change direction and...
-        forceAdded = true;
+        //Reset variables
+        playerRb.useGravity = true;
+        enemyRb.isKinematic = false;
+        forceAdded = true;   
     }
-    //void ResetPush()
-    //{
-    //    if (!pcScript.IsGrounded() && pcScript.disableMovement == true)
-    //    {
-            
-    //    }
-
-    //    //if (pcScript.IsGrounded() && forceAdded == true)
-    //    //{
-
-    //    //}
-    //}
 
     void OnCollisionEnter(Collision collision)
     {
@@ -98,7 +90,6 @@ public class PlayerManager : MonoBehaviour
             //Reset push
             playerRb.velocity = Vector3.zero;
             pcScript.disableMovement = false;
-            enemyRb.isKinematic = false;
             forceAdded = false;
             //Debug.Log("Landed after push");
         }

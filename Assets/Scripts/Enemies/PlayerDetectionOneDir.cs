@@ -20,7 +20,8 @@ public class PlayerDetectionOneDir : MonoBehaviour
     private void Update()
     {
         //Move in the local direction of the transform. Important since we will be rotating the enemy on collision with obstructions
-        enemyDir = gameObject.transform.right.normalized;
+        enemyDir = gameObject.transform.forward.normalized;
+        //Debug.Log("enemyDir: " + enemyDir);
     }
     //Check to see if the enemy can spot the playqer within the specified range
     public bool CanSeePlayer()
@@ -30,13 +31,19 @@ public class PlayerDetectionOneDir : MonoBehaviour
         float castDist = aggroRange;
 
         //Check in which direction the enemy is looking, and set the direction for the linecast accordingly
-        if (enemyDir.x < 1)
+        if (enemyDir.x > 0)
+        {
+            castDist = aggroRange;
+        }
+        else if (enemyDir.x < 0)
         {
             castDist = -aggroRange;
         }
 
         //Make the enemy eyes the cast point for the linecast at the parameter distance LayerMask.NameToLayer("Action")
+        
         Vector3 endPos = eyes.position + Vector3.right * castDist;
+        //Debug.Log("endPos: " + endPos);
 
         //Cast a line from the enemy in the Action layer
         Physics.Linecast(eyes.position, endPos, out RaycastHit hit, detectionLayers);

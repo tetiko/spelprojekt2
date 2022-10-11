@@ -17,27 +17,21 @@ public class Silverfish_PatrollingState : MasterState
     AI_Silverfish vars;
     Silverfish_Patrol patrol;
     PlayerDetectionOneDir playerDetection;
+    CanRotate canRotate;
 
     [HideInInspector] public bool goTo_Silverfish_PauseState = false;
-
-    //Bool for making onStart() run only once per state inititation
-    bool executed = false;
 
     private void Awake()
     {
         vars = GetComponentInParent<AI_Silverfish>();
         patrol = GetComponentInParent<Silverfish_Patrol>();
         playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
+        canRotate = GetComponentInParent<CanRotate>();
     }
 
     //Update function for the state machine
     public override MasterState RunCurrentState()
     {
-        if (!executed)
-        {
-            OnStart();
-        }
-
         //Check if we remember the player
         if (vars.hasMemory)
         {
@@ -46,8 +40,8 @@ public class Silverfish_PatrollingState : MasterState
             //Transition to Attack state
             return silverfish_AttackState;
         }
-        //Go into the PlayerDetectionOneDir script and check if we can see the player
-        else if (playerDetection.CanSeePlayer())
+        //Check if we can see the player and if the enemy finished rotating
+        else if (playerDetection.CanSeePlayer() && !vars.hasMemory && !canRotate.rotate)
         {
             //Debug.Log("Patrolling State to Reaction State");
             //Disable the Patrol script
@@ -80,12 +74,5 @@ public class Silverfish_PatrollingState : MasterState
             //Stay in Patrolling State
             return this;
         }  
-    }
-
-    void OnStart()
-    {
-        //Enable kinematic
-        //vars.enemyRb.isKinematic = false;
-        executed = true;
     }
 }

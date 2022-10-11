@@ -15,13 +15,8 @@ public class Silverfish_PauseState : MasterState
     Silverfish_Pause pause;
     PlayerDetectionOneDir playerDetection;
 
-    [HideInInspector] public bool goToS_ilverfish_PatrollingState = false;
+    [HideInInspector] public bool goTo_Silverfish_PatrollingState = false;
     [HideInInspector] public bool goTo_Silverfish_AttackState = false;
-
-    //Bool for making onStart() run only once per state inititation
-    bool executed = false;
-
-    
 
     void Awake()
     {
@@ -33,30 +28,17 @@ public class Silverfish_PauseState : MasterState
     //Update function for the state machine
     public override MasterState RunCurrentState()
     {
-        if (!executed)
-        {
-            OnStart();
-        }
-
-        //Reset the executed variable to only call OnStart() once
-        //if (vars.pauseEnable == true)
-        //{
-        //    executed = true;
-        //}
-        //else
-        //{
-        //    executed = false;
-        //}
-
+        OnStart();
+  
         playerDetection.CanSeePlayer();
 
         //Debug.Log("StateTransition to Patrolling: " + StateTransition());
-        if (goToS_ilverfish_PatrollingState)
+        if (goTo_Silverfish_PatrollingState)
         { 
             //Disable the Pause script
             vars.pauseEnable = false;
             //Reset state transition
-            goToS_ilverfish_PatrollingState = false;
+            goTo_Silverfish_PatrollingState = false;
             //Transition into the Patrolling State
             return Silverfish_PatrollingState;
         }

@@ -11,6 +11,7 @@ public class Ladybug_Patrol : MonoBehaviour
     AI_Ladybug vars;
     Ladybug_PatrollingState patrollingState;
     PlayerManager playerManager;
+    CanRotate canRotate;
 
     [HideInInspector] public bool disableEnemyMovement = false;
 
@@ -22,6 +23,7 @@ public class Ladybug_Patrol : MonoBehaviour
         vars = GetComponent<AI_Ladybug>();
         patrollingState = GetComponentInChildren<Ladybug_PatrollingState>();
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
+        canRotate = GetComponent<CanRotate>();
     }
 
     // OnEnable is called upon enabling a component
@@ -56,29 +58,35 @@ public class Ladybug_Patrol : MonoBehaviour
             //If we collided with the player
             if (col.CompareTag("Player"))
             {
-                ////Get the closest obstruction
-                //GameObject closestObs = ClosestTagObject.ClosestObjectWithtag(col.transform, "Obstruction");
-                ////Get distance to the closest obstruction
-                //float dist = Vector3.Distance(closestObs.transform.position, transform.position);
+                //Get the closest obstruction
+                GameObject closestObs = ClosestTagObject.ClosestObjectWithtag(col.transform, "Obstruction");
+                //Get distance to the closest obstruction
+                float dist = Vector3.Distance(closestObs.transform.position, transform.position);
 
-                ////Change direction and keep patrolling if the enemy is close to an obstruction to avoid hitting the player multiple times
-                //if (dist < vars.obsTurnDist)
-                //{
-                //    //Push the player away
-                //    playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
-                //    //Change direction upon collision with obstruction
-                //    DirChange(vars.enemyDir, vars.enemyRb);
-                //    //Switch to Patrolling state after waiting for the direction change
-                //}
-                //else
-                //{
+                //Change direction and stay to patrol if the enemy is close to an obstruction to avoid hitting the player multiple times
+                if (dist < vars.obsTurnDist)
+                {
+                    Debug.Log("close to obstacle");
+                    //Push the player away
+                    playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
+                    //The enemy is struck with a sudden case of Amnesia
+
+                    //Change direction upon collision with the player
+                    if (!canRotate.rotate)
+                    {
+                        canRotate.rotate = true;
+                        canRotate.getTargetRotation = true;
+                    }
+                } else
+                {
                     //Push the player away
                     playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
 
                     //Switch to Pause state
                     patrollingState.ladybug_goToPauseState = true;
                     //Debug.Log("ChaseAttack collision with Player");
-                //}
+                    //}
+                }
             }
 
             if (col.CompareTag("Obstruction"))

@@ -8,11 +8,15 @@ public class Silverfish_React : MonoBehaviour
     //Access external scripts
     AI_Silverfish vars;
     Silverfish_ReactionState silverfish_ReactionState;
+    PlayerManager playerManager;
 
+    Animator animator;
     private void Awake()
     {
         vars = GetComponent<AI_Silverfish>();
         silverfish_ReactionState = GetComponentInChildren<Silverfish_ReactionState>();
+        playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
+        animator = GetComponent<Animator>();
     }
 
     // OnEnable is called upon enabling a component
@@ -20,7 +24,7 @@ public class Silverfish_React : MonoBehaviour
     {
         //Get the name of this action
         vars.currentAction = GetType();
-        //Debug.Log("Class: " + GetType());
+        Debug.Log("Class: " + GetType());
 
         //Go directly into the Reacting function
         Reacting(gameObject);
@@ -29,25 +33,48 @@ public class Silverfish_React : MonoBehaviour
     public void Reacting(GameObject enemyType)
     {
         //Debug.Log("enemyType: " + enemyType.tag);
-        //Memorize the player for a set amount of time using the EnemyMemory script
-        vars.hasMemory = true;
+        //Memorize the player for a set amount of time using the EnemyMemory script 
+          vars.hasMemory = true;
         StartCoroutine(EnemyMemory.Timer(vars.memoryCapacity));
 
-        if (enemyType.tag == "Jump Reaction")
+        //Play React animation
+        if (animator != null)
         {
-            //Debug.Log("Jump Reaction");
-            //React with a surprise jump
-            vars.enemyRb.AddForce(Vector3.up * vars.jumpReactionForce, ForceMode.Impulse);
-
-            //Wait for the reaction to play out before chasing
-            StartCoroutine(StateTransition(0.5f));
+            animator.SetTrigger("Tr_React");
         }
+
+        StartCoroutine(StateTransition(0.5f));
+
+        //if (enemyType.tag == "Jump Reaction")
+        //{
+        //    //Debug.Log("Jump Reaction");
+        //    //React with a surprise jump
+        //    vars.enemyRb.AddForce(Vector3.up * vars.jumpReactionForce, ForceMode.Impulse);
+
+        //    //Wait for the reaction to play out before chasing
+        //    StartCoroutine(StateTransition(0.5f));
+        //}
     }
 
     IEnumerator StateTransition(float time)
     {
         yield return new WaitForSeconds(time);
-        //state transition
+        //State transition to attack state
         silverfish_ReactionState.goTo_Silverfish_AttackState = true;
+    }
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        if (vars.reactEnable)
+        {
+            //On collision with player
+            if (collision.gameObject.CompareTag("Player"))
+            {
+                //Push the player away
+                playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
+                //... initiate state transition to pause state
+                silverfish_ReactionState.goTo_Silverfish_AttackState = true;
+            }
+        }
     }
 }
