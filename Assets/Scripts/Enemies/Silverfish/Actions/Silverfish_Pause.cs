@@ -12,6 +12,8 @@ public class Silverfish_Pause : MonoBehaviour
     PlayerManager playerManager;
     CanRotate canRotate;
 
+    Animator animator;
+
     Type previousAction;
 
     private void Awake()
@@ -20,6 +22,7 @@ public class Silverfish_Pause : MonoBehaviour
         silverfish_PauseState = GetComponentInChildren<Silverfish_PauseState>();
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
         canRotate = GetComponent<CanRotate>();
+        animator = GetComponent<Animator>();
 
     }
 
@@ -38,6 +41,12 @@ public class Silverfish_Pause : MonoBehaviour
 
     public void Pausing()
     {
+        //Play Pause animation
+        if (animator != null)
+        {
+            animator.SetTrigger("Tr_Pause");
+        }
+
         //Pause, change direction and initiate state transition
         StartCoroutine(StateTransition(vars.pauseDuration));
     }
@@ -52,6 +61,13 @@ public class Silverfish_Pause : MonoBehaviour
             //... if not, rotate and...
             if (!canRotate.rotate)
             {
+                //Play Turn animation
+                if (animator != null)
+                {
+                    animator.SetTrigger("Tr_Turn");
+                }
+
+                //Change direction
                 canRotate.rotate = true;
                 canRotate.getTargetRotation = true;
             }

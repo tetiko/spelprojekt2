@@ -47,6 +47,7 @@ public class AI_Silverfish : MonoBehaviour
     public float jumpReactionForce = 5f;
     public float pauseDuration = 1f;
     public float memoryCapacity = 5f;
+    public float headbuttStartDist = 1.6f;
     public float obsTurnDist = 1f;
     public bool defaultPushForces = true;
     [Header("Push Forces (Overriden if Default Push Forces is checked)")]

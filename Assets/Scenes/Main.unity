@@ -3958,6 +3958,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 584870605}
     - target: {fileID: 5528938158677781195, guid: 0e8093611c3753a418450493090ee6a2, type: 3}
+      propertyPath: headbuttStartDist
+      value: 1.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5528938158677781195, guid: 0e8093611c3753a418450493090ee6a2, type: 3}
       propertyPath: jumpReactionForce
       value: 3
       objectReference: {fileID: 0}
@@ -3995,6 +3999,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2182580240821826747, guid: 0e8093611c3753a418450493090ee6a2, type: 3}
+    - {fileID: 899127893344202277, guid: 0e8093611c3753a418450493090ee6a2, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 0e8093611c3753a418450493090ee6a2, type: 3}
 --- !u!4 &1784962190 stripped
 Transform:

@@ -34,7 +34,7 @@ public class Silverfish_React : MonoBehaviour
     {
         //Debug.Log("enemyType: " + enemyType.tag);
         //Memorize the player for a set amount of time using the EnemyMemory script 
-          vars.hasMemory = true;
+        vars.hasMemory = true;
         StartCoroutine(EnemyMemory.Timer(vars.memoryCapacity));
 
         //Play React animation

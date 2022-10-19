@@ -17,6 +17,7 @@ public class Silverfish_ChaseAttack : MonoBehaviour
 
     //Variable for storing collisions with the player used in Patrolling_State
     [HideInInspector] public GameObject col = null;
+    
 
     void Awake()
     {
@@ -33,20 +34,34 @@ public class Silverfish_ChaseAttack : MonoBehaviour
         //Get the name of this action
         vars.currentAction = GetType();
         Debug.Log("Class: " + GetType());
-    }
 
+        animator.ResetTrigger("Tr_Headbutt");
+
+        //Play Charge animation
+        if (animator != null)
+        {  
+            animator.SetTrigger("Tr_Charge");
+        }
+    }
     void FixedUpdate()
     {
-            Attack();
+        Attack();
     }
 
     public void Attack()
     {
-        //Play Charge animation
-        if (animator != null)
+        float dist = Vector3.Distance(vars.playerObject.transform.position, transform.position);
+        //Debug.Log("dist: " + dist);
+
+        //Initiate Headbutt animation at the appropriate distance
+        if (animator != null && dist < vars.headbuttStartDist)
         {
-            animator.SetTrigger("Tr_Charge");
+            Debug.Log("Headbutt");
+            
+            animator.SetTrigger("Tr_Headbutt");
         }
+
+        //Attack
         vars.enemyRb.MovePosition(vars.enemyRb.position + vars.enemyDir * Time.fixedDeltaTime * vars.chaseSpeed);
     }
 
@@ -61,11 +76,6 @@ public class Silverfish_ChaseAttack : MonoBehaviour
             //If we collided with the player
             if (col.CompareTag("Player"))
             {
-                //Initiate Headbutt animation
-                if (animator != null)
-                {
-                    animator.SetTrigger("Tr_Headbutt");
-                }
                 //Get the closest obstruction
                 GameObject closestObs = ClosestTagObject.ClosestObjectWithtag(col.transform, "Obstruction");
                 //Get distance to the closest obstruction
@@ -74,7 +84,7 @@ public class Silverfish_ChaseAttack : MonoBehaviour
                 //Change direction and switch to patrol if the enemy is close to an obstruction to avoid hitting the player multiple times
                 if (dist < vars.obsTurnDist)
                 {
-                    Debug.Log("close to obstacle");
+                    //Debug.Log("close to obstacle");
                     //Push the player away
                     playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
                     //The enemy is struck with a sudden case of Amnesia
@@ -128,10 +138,10 @@ public class Silverfish_ChaseAttack : MonoBehaviour
         silverfish_AttackState.goTo_Silverfish_PatrollingState = true;
     }
 
-    IEnumerator StateTransitionToPause(float time)
-    {
-        yield return new WaitForSeconds(time);
-        //State transition
-        silverfish_AttackState.goTo_Silverfish_PatrollingState = true;
-    }
+    //IEnumerator StateTransitionToPause(float time)
+    //{
+    //    yield return new WaitForSeconds(time);
+    //    //State transition
+    //    silverfish_AttackState.goTo_Silverfish_PatrollingState = true;
+    //}
 }

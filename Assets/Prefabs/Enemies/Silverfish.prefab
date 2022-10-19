@@ -3269,6 +3269,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3086380911623297746}
   - component: {fileID: 3217690227865139699}
+  - component: {fileID: 899127893344202277}
   - component: {fileID: 4789288635167747107}
   - component: {fileID: 8677712519296340710}
   - component: {fileID: 5528938158677781195}
@@ -3333,6 +3334,23 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!111 &899127893344202277
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6898404966209558149}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations:
+  - {fileID: 5469645475262838933, guid: 66048e4d7200ba04ca8e4a495397bd5e, type: 3}
+  - {fileID: 8432966906990119385, guid: 66048e4d7200ba04ca8e4a495397bd5e, type: 3}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!54 &4789288635167747107
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3383,6 +3401,7 @@ MonoBehaviour:
   jumpReactionForce: 4
   pauseDuration: 1
   memoryCapacity: 5
+  headbuttStartDist: 2
   obsTurnDist: 1
   defaultPushForces: 1
   impactForceX: 0

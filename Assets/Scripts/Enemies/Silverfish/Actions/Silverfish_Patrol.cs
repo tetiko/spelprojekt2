@@ -14,6 +14,7 @@ public class Silverfish_Patrol : MonoBehaviour
     CanRotate canRotate;
 
     Animator animator;
+    Animation anim;
 
     //Variable for storing collisions with the player used in Patrolling_State
     [HideInInspector] public GameObject col = null;
@@ -25,6 +26,8 @@ public class Silverfish_Patrol : MonoBehaviour
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
         canRotate = GetComponent<CanRotate>();
         animator = GetComponent<Animator>();
+        anim = GetComponent<Animation>();
+
     }
 
     // OnEnable is called upon enabling a component
@@ -33,6 +36,21 @@ public class Silverfish_Patrol : MonoBehaviour
         //Get the name of this action
         vars.currentAction = GetType();
         Debug.Log("Class: " + GetType());
+
+        //Play Patrol animation
+        if (animator != null)
+        {
+            animator.SetTrigger("Tr_Patrol");
+        }
+    }
+
+    private void Update()
+    {
+        if(animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Turn") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !animator.IsInTransition(0))
+        {
+            Debug.Log("1 Turn animation loop over");
+            animator.SetTrigger("Tr_Patrol");
+        }
     }
 
     void FixedUpdate()
@@ -43,12 +61,6 @@ public class Silverfish_Patrol : MonoBehaviour
     //Go about our usual patrolling business
     public void Patrolling()
     {
-        //Play Patrol animation
-        if (animator != null)
-        {
-            animator.SetTrigger("Tr_Patrol");
-        }
-
         //Debug.Log("vars.enemyRb.position: " + vars.enemyRb.position);
         vars.enemyRb.MovePosition(vars.enemyRb.position + vars.enemyDir * Time.fixedDeltaTime * vars.moveSpeed);
     }
@@ -70,15 +82,18 @@ public class Silverfish_Patrol : MonoBehaviour
 
             if (col.CompareTag("Obstruction") && !canRotate.rotate)
             {
-                //Play Turn animation
+                //Play Turn animation followed by Patrol animation
                 if (animator != null)
                 {
+                    //anim.PlayQueued("SilverfishRig|Turn", QueueMode.CompleteOthers);
+                    //anim.PlayQueued("SilverfishRig|Walking", QueueMode.CompleteOthers);
                     animator.SetTrigger("Tr_Turn");
-                    animator.SetTrigger("Tr_Patrol");
                 }
+
                 //Rotate the enemy
                 canRotate.rotate = true;
                 canRotate.getTargetRotation = true;
+
             }
         }
     } 
