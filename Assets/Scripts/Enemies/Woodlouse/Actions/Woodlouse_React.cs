@@ -31,7 +31,6 @@ public class Woodlouse_React : MonoBehaviour
         //Debug.Log("enemyType: " + enemyType.tag);
         //Memorize the player for a set amount of time using the EnemyMemory script
         vars.hasMemory = true;
-        StartCoroutine(EnemyMemory.Timer(vars.memoryCapacity));
 
         if (enemyType.tag == "Jump Reaction")
         {

@@ -14,7 +14,6 @@ public class Silverfish_Patrol : MonoBehaviour
     CanRotate canRotate;
 
     Animator animator;
-    Animation anim;
 
     //Variable for storing collisions with the player used in Patrolling_State
     [HideInInspector] public GameObject col = null;
@@ -26,8 +25,6 @@ public class Silverfish_Patrol : MonoBehaviour
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
         canRotate = GetComponent<CanRotate>();
         animator = GetComponent<Animator>();
-        anim = GetComponent<Animation>();
-
     }
 
     // OnEnable is called upon enabling a component
@@ -37,11 +34,12 @@ public class Silverfish_Patrol : MonoBehaviour
         vars.currentAction = GetType();
         Debug.Log("Class: " + GetType());
 
+        animator.ResetTrigger("Tr_Turn");
+        animator.ResetTrigger("Tr_Charge");
+
         //Play Patrol animation
-        if (animator != null)
-        {
-            animator.SetTrigger("Tr_Patrol");
-        }
+        animator.SetTrigger("Tr_Patrol");
+
     }
 
     private void Update()
@@ -82,11 +80,9 @@ public class Silverfish_Patrol : MonoBehaviour
 
             if (col.CompareTag("Obstruction") && !canRotate.rotate)
             {
-                //Play Turn animation followed by Patrol animation
+                //Play Turn animation
                 if (animator != null)
                 {
-                    //anim.PlayQueued("SilverfishRig|Turn", QueueMode.CompleteOthers);
-                    //anim.PlayQueued("SilverfishRig|Walking", QueueMode.CompleteOthers);
                     animator.SetTrigger("Tr_Turn");
                 }
 

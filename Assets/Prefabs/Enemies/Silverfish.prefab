@@ -3396,17 +3396,17 @@ MonoBehaviour:
   playerRb: {fileID: 0}
   enemyObject: {fileID: 0}
   enemyRb: {fileID: 0}
-  moveSpeed: 10
-  chaseSpeed: 3
-  jumpReactionForce: 4
+  moveSpeed: 1
+  chaseSpeed: 4
+  jumpReactionForce: 3
   pauseDuration: 1
-  memoryCapacity: 5
+  memoryCapacity: 1
   headbuttStartDist: 2
-  obsTurnDist: 1
+  obsTurnDist: 1.5
   defaultPushForces: 1
   impactForceX: 0
   impactForceY: 0
-  hasMemory: 0
+  usingMemory: 0
   enemyDir: {x: 0, y: 0, z: 0}
   pcScript: {fileID: 0}
   chaseAttackEnable: 0
@@ -3425,7 +3425,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf4ce9ecf5d64db4696a3e0caf3d8836, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aggroRange: 3
+  aggroRange: 4
   eyes: {fileID: 5043479207808120176}
   detectionLayers:
     serializedVersion: 2

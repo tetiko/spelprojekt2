@@ -8,7 +8,7 @@ public class CanRotate : MonoBehaviour
     //canRotate.rotate = true;
     //canRotate.getTargetRotation = true;
 
-    public bool rotate = false;
+    [HideInInspector] public bool rotate = false;
     public int turnSpeed = 10;
     Quaternion targetRotation;
     [HideInInspector] public bool getTargetRotation = false;
@@ -38,8 +38,7 @@ public class CanRotate : MonoBehaviour
 
             //Flag the direction change as over once the rotation is finished
             if (Quaternion.Angle(transform.rotation, targetRotation) <= 0.05f)
-
-            {
+            {      
                 rotate = false;
             }     
         } 

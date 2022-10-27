@@ -8,6 +8,7 @@ using System;
 
 public class PlayerDetectionOneDir : MonoBehaviour
 {
+   
     Vector3 enemyDir;
     public float aggroRange = 30f;
 
@@ -27,7 +28,6 @@ public class PlayerDetectionOneDir : MonoBehaviour
     public bool CanSeePlayer()
     {
         bool val = false;
-
         float castDist = aggroRange;
 
         //Check in which direction the enemy is looking, and set the direction for the linecast accordingly
@@ -40,32 +40,35 @@ public class PlayerDetectionOneDir : MonoBehaviour
             castDist = -aggroRange;
         }
 
-        //Make the enemy eyes the cast point for the linecast at the parameter distance LayerMask.NameToLayer("Action")
-        
         Vector3 endPos = eyes.position + Vector3.right * castDist;
-        //Debug.Log("endPos: " + endPos);
+        //Vector3 endPos2 = eyes.position + new Vector3(0, 0, -0.05f) + Vector3.right * castDist;
+        //Vector3 endPos3 = eyes.position + new Vector3(0, 0, 0.05f) + Vector3.right * castDist;
+
+        //Vector3 hit2_Z = new Vector3(0, 0, -0.05f);
+        //Vector3 hit3_Z = new Vector3(0, 0, 0.05f);
 
         //Cast a line from the enemy in the Action layer
         Physics.Linecast(eyes.position, endPos, out RaycastHit hit, detectionLayers);
+        //Physics.Linecast(eyes.position + hit2_Z, endPos2, out RaycastHit hit2, detectionLayers);
+        //Physics.Linecast(eyes.position + hit3_Z, endPos3, out RaycastHit hit3, detectionLayers);
 
-        //Check to see if we hit something in the Action layer mask
         if (hit.collider != null)
-        {
-            //Debug.Log("Linecast hit something in the Action/Ground layer");
+        { 
+            //Debug.Log("Linecast hit something in the detectionLayers");
 
-            //Check to see if we hit the player
+            //Check to see if we hit an obstruction
             if (hit.collider.gameObject.CompareTag("Obstruction"))
+                //|| hit2.collider.gameObject.CompareTag("Obstruction")
+                //|| hit3.collider.gameObject.CompareTag("Obstruction"))
             {
-                //Store the latest Obstruction hit for use in enemy AI
-                val = true;
-
-                //Debug.Log("Linecast hit the object tagged Player")
+                //Debug.Log("Linecast hit obstruction")
             }
 
             //Check to see if we hit the player
             if (hit.collider.gameObject.CompareTag("Player"))
+                
             {
-                //Onward!
+                //Onward !
                 val = true;
 
                 //Debug.Log("Linecast hit the object tagged Player")
@@ -76,13 +79,24 @@ public class PlayerDetectionOneDir : MonoBehaviour
             }
 
             //Draw a red line that shows the enemy spotting an oject
+            //Draw a blue line that represents the enemy's vision
             Debug.DrawLine(eyes.position, hit.point, Color.red);
+            //Debug.DrawLine(eyes.position + hit2_Z, hit.point, Color.red);
+            //Debug.DrawLine(eyes.position + hit3_Z, hit.point, Color.red);
         }
         else
         {
             //Draw a blue line that represents the enemy's vision
             Debug.DrawLine(eyes.position, endPos, Color.blue);
+            //Debug.DrawLine(eyes.position + hit2_Z, endPos2, Color.blue);
+            //Debug.DrawLine(eyes.position + hit3_Z, endPos3, Color.blue);
+
         }
         return val;
     }
+    //public void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.yellow;
+    //    Gizmos.DrawSphere(transform.position, 1);
+    //}
 }

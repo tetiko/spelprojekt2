@@ -88,16 +88,16 @@ public class AI_Ladybug : MonoBehaviour
     //Debug: Display the current state and action above the enemy
     public void OnDrawGizmos()
     {
-        if (Application.isPlaying) 
+        if (Application.isPlaying)
         {
             //State
             GUI.color = Color.black;
-            Handles.Label(new Vector3((float)(transform.position.x - 0.1), (float)(transform.position.y + 0.35)), currentState.GetType().ToString());
+            Handles.Label(new Vector3((float)(transform.position.x - 0.1), (float)(transform.position.y + 0.35), transform.position.z), currentState.GetType().ToString());
             //Action
             if (currentAction != null)
-            { 
+            {
                 GUI.color = Color.black;
-                Handles.Label(new Vector3((float)(transform.position.x - 0.1), (float)(transform.position.y + 0.47)), "Action: " + currentAction.ToString());
+                Handles.Label(new Vector3((float)(transform.position.x - 0.1), (float)(transform.position.y + 0.47), transform.position.z), "Action: " + currentAction.ToString());
             }
         }
     }

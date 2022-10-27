@@ -32,16 +32,8 @@ public class Silverfish_PatrollingState : MasterState
     //Update function for the state machine
     public override MasterState RunCurrentState()
     {
-        //Check if we remember the player
-        if (vars.hasMemory)
-        {
-            //Disable the Patrol script
-            vars.patrolEnable = false;
-            //Transition to Attack state
-            return silverfish_AttackState;
-        }
-        //Check if we can see the player and if the enemy finished rotating
-        else if (playerDetection.CanSeePlayer() && !vars.hasMemory && !canRotate.rotate)
+        //Check if we can see the player, have a memory of it, and if the enemy finished rotating
+        if (playerDetection.CanSeePlayer() && !canRotate.rotate)
         {
             //Debug.Log("Patrolling State to Reaction State");
             //Disable the Patrol script

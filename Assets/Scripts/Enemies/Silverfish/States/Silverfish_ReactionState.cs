@@ -27,11 +27,18 @@ public class Silverfish_ReactionState : MasterState
     //Update function for the state machine
     public override MasterState RunCurrentState()
     {
-        //Debug.Log("vars.reactEnable: " + vars.reactEnable);
-
-        OnStart();
-
         playerDetection.CanSeePlayer();
+
+        //Check if the 'React' script is added to the object
+        if (react != null)
+        {
+            //Initiate the React effects
+            vars.reactEnable = true;
+        }
+        else
+        {
+            Debug.Log("Resolve issue: Add the 'React' script to " + vars.enemyObject);
+        }
 
         if (goTo_Silverfish_AttackState)
         {
@@ -49,17 +56,6 @@ public class Silverfish_ReactionState : MasterState
         }
     }
    
-    void OnStart()
-    {
-        //Check if the 'React' script is added to the object
-        if (react != null)
-        {
-            //Initiate the React effects
-            vars.reactEnable = true;  
-        }
-        else
-        {
-            Debug.Log("Resolve issue: Add the 'React' script to " + vars.enemyObject);
-        }
-    }
+
+
 }

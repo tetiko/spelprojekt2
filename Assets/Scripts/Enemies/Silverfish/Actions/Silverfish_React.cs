@@ -27,15 +27,12 @@ public class Silverfish_React : MonoBehaviour
         Debug.Log("Class: " + GetType());
 
         //Go directly into the Reacting function
-        Reacting(gameObject);
+        Reacting();
     }
 
-    public void Reacting(GameObject enemyType)
+    public void Reacting()
     {
         //Debug.Log("enemyType: " + enemyType.tag);
-        //Memorize the player for a set amount of time using the EnemyMemory script 
-        vars.hasMemory = true;
-        StartCoroutine(EnemyMemory.Timer(vars.memoryCapacity));
 
         //Play React animation
         if (animator != null)
@@ -44,16 +41,6 @@ public class Silverfish_React : MonoBehaviour
         }
 
         StartCoroutine(StateTransition(0.5f));
-
-        //if (enemyType.tag == "Jump Reaction")
-        //{
-        //    //Debug.Log("Jump Reaction");
-        //    //React with a surprise jump
-        //    vars.enemyRb.AddForce(Vector3.up * vars.jumpReactionForce, ForceMode.Impulse);
-
-        //    //Wait for the reaction to play out before chasing
-        //    StartCoroutine(StateTransition(0.5f));
-        //}
     }
 
     IEnumerator StateTransition(float time)

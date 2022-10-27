@@ -23,6 +23,7 @@ using TMPro;
 //When this script is attached to the enemy object the below actions will be automagically added
 //The required actions for this AI:
 [RequireComponent(typeof(PlayerDetectionOneDir))]
+[RequireComponent(typeof(CanRotate))]
 [RequireComponent(typeof(Woodlouse_RushAttack))]
 [RequireComponent(typeof(Woodlouse_Patrol))]
 [RequireComponent(typeof(Woodlouse_React))]
@@ -49,11 +50,11 @@ public class AI_Woodlouse : MonoBehaviour
     [Header("Push Forces (Overriden if Default Push Forces is checked)")]
     public float impactForceX;
     public float impactForceY;
-    public bool hasMemory = false;
+    [HideInInspector] public bool hasMemory = false;
 
     [HideInInspector] public Vector3 enemyDir;
     [HideInInspector] public PlayerController pcScript;
-
+ 
     //Script name
     public Type enemyName;
 
@@ -95,16 +96,6 @@ public class AI_Woodlouse : MonoBehaviour
         enemyDir = gameObject.transform.right.normalized;
         //Debug.Log("enemyDir :" + enemyDir);
 
-        //Determine if the enemy remembers the player or not
-        if (EnemyMemory.MemoryOfPlayer(hasMemory))
-        {
-            hasMemory = true;
-        }
-        else
-        {
-            hasMemory = false;
-        }
-
         //Dynamically enable/disable actions from the state scripts
         GetComponent<Woodlouse_Patrol>().enabled = patrolEnable;
         GetComponent<Woodlouse_Pause>().enabled = pauseEnable;
@@ -115,16 +106,16 @@ public class AI_Woodlouse : MonoBehaviour
     //Debug: Display the current state and action above the enemy
     public void OnDrawGizmos()
     {
-        if (Application.isPlaying) 
+        if (Application.isPlaying)
         {
             //State
             GUI.color = Color.black;
-            Handles.Label(new Vector3((float)(transform.position.x - 0.1), (float)(transform.position.y + 0.35)), currentState.GetType().ToString());
+            Handles.Label(new Vector3((float)(transform.position.x - 0.1), (float)(transform.position.y + 0.35), transform.position.z), currentState.GetType().ToString());
             //Action
             if (currentAction != null)
-            { 
+            {
                 GUI.color = Color.black;
-                Handles.Label(new Vector3((float)(transform.position.x - 0.1), (float)(transform.position.y + 0.47)), "Action: " + currentAction.ToString());
+                Handles.Label(new Vector3((float)(transform.position.x - 0.1), (float)(transform.position.y + 0.47), transform.position.z), "Action: " + currentAction.ToString());
             }
         }
     }

@@ -28,9 +28,18 @@ public class Silverfish_PauseState : MasterState
     //Update function for the state machine
     public override MasterState RunCurrentState()
     {
-        OnStart();
-  
         playerDetection.CanSeePlayer();
+
+        //Check if the 'Pause' script is added to the object
+        if (pause != null)
+        {
+            //Initiate the Pause effects
+            vars.pauseEnable = true;
+        }
+        else
+        {
+            Debug.Log("Resolve issue: Add the 'Pause' script to " + vars.enemyObject);
+        }
 
         //Debug.Log("StateTransition to Patrolling: " + StateTransition());
         if (goTo_Silverfish_PatrollingState)
@@ -56,20 +65,6 @@ public class Silverfish_PauseState : MasterState
         {
             //Stay in Pause State
             return this;
-        }
-    }
-
-    void OnStart()
-    { 
-        //Check if the 'Pause' script is added to the object
-        if (pause != null)
-        {
-            //Initiate the Pause effects
-            vars.pauseEnable = true;
-        }
-        else
-        {
-            Debug.Log("Resolve issue: Add the 'Pause' script to " + vars.enemyObject);
         }
     }
 }
