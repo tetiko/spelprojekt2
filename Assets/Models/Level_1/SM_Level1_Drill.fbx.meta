@@ -15,7 +15,12 @@ ModelImporter:
   - first:
       74: -7546792966882740341
     second: DrillArmature|DrillheadRotation
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Drill-ImageTexturing
+    second: {fileID: 2100000, guid: 2c6d535307287044597819037b3d7b6d, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
