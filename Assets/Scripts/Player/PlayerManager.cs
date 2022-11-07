@@ -8,11 +8,16 @@ public class PlayerManager : MonoBehaviour
     //Access external scripts
     PlayerController pcScript;
 
+    float resetMoveSpeed;
+
     Vector3 playerDir;
     Rigidbody playerRb;
     Rigidbody enemyRb;
 
-    bool forceAdded = false;
+    [HideInInspector] public bool forceAdded = false;
+    public bool slippery = false, glide = false;
+    public Vector3 initialGlideVel;
+    public Vector3 initialOilVel;
 
     // Start is called before the first frame update
     void Start()
@@ -53,7 +58,7 @@ public class PlayerManager : MonoBehaviour
         playerDir = (transform.position - forceSource.transform.position).normalized;
         //Debug.Log("playerDir.x: " + playerDir.x);
 
-        //If Default Push Forces is checked in the inspector for this object
+        //If Default Push Forces is true for this object
         if (defaultPushForces && pcScript.disableMovement == true && playerRb.velocity == Vector3.zero && enemyRb.isKinematic == true)
         {
             //Get the force power to apply
@@ -61,7 +66,7 @@ public class PlayerManager : MonoBehaviour
             //Debug.Log("Default xForce: " + xForce);
             playerRb.AddForce(xForce, pcScript.impactForceY, 0, ForceMode.Impulse);
         }
-        //If Default Push Forces is not checked
+        //If Default Push Forces is false
         else if (!defaultPushForces && pcScript.disableMovement == true && playerRb.velocity == Vector3.zero)
         {
             float xForce = playerDir.x * customXForce;
@@ -70,7 +75,7 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    IEnumerator DisableMovement(float time)
+    public IEnumerator DisableMovement(float time)
     {
         //Wait a minimum amount of time before movement can be enabled
         yield return new WaitForSeconds(time);
@@ -84,6 +89,7 @@ public class PlayerManager : MonoBehaviour
     {
         GameObject colObject = collision.gameObject;
         LayerMask colMask = collision.gameObject.layer;
+
         //Enable movement again after the player lands again or collides with an obstruction
         if (forceAdded && colObject.CompareTag("Obstruction") || forceAdded && colMask == LayerMask.NameToLayer("Ground"))
         {
@@ -94,5 +100,66 @@ public class PlayerManager : MonoBehaviour
             //Debug.Log("Landed after push");
         }
     }
+
+    //Interactables and hazards affecting the player
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.name == "Spiderweb")
+        {
+            pcScript.disableJump = true;
+            resetMoveSpeed = pcScript.moveSpeed;
+            pcScript.moveSpeed = pcScript.webbedMoveSpeed;
+        }
+
+        if (other.name == "Oil Spill")
+        {
+            //resetMoveSpeed = pcScript.oilMoveSpeed;
+            //pcScript.moveSpeed = pcScript.oilMoveSpeed;
+            slippery = true;
+            glide = true;
+
+            if (glide)
+            {
+                initialGlideVel = playerRb.velocity;
+                playerRb.velocity = new Vector3(initialGlideVel.x, playerRb.velocity.y);
+            }
+            //else if (!glide)
+            //{
+            //    initialOilVel = playerRb.velocity;
+                
+            //}
+            
+        }
+
+        if (other.name == "Bouncy Area")
+        {
+            float velX = playerRb.velocity.x;
+            pcScript.disableMovement = true;
+            playerRb.AddForce(new Vector3(velX * pcScript.bounceForceX, pcScript.bounceForceY), ForceMode.Impulse);
+            StartCoroutine(Trampoline(0.05f));
+        }
+    }
+
+    IEnumerator Trampoline(float time)
+    {
+        yield return new WaitForSeconds(time);
+        forceAdded = true;
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.name == "Spiderweb")
+        {
+            pcScript.disableJump = false;
+            pcScript.moveSpeed = resetMoveSpeed;
+        }
+
+        if (other.name == "Oil Spill")
+        {
+            slippery = false;
+            glide = false;
+        }
+    }
+
 
 }

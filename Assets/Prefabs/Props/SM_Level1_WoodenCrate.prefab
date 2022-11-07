@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5174163259661167241}
   - component: {fileID: 6929532791082966595}
   - component: {fileID: 8641054161771741268}
+  - component: {fileID: -8092034548518690973}
   m_Layer: 6
   m_Name: SM_Level1_WoodenCrate
   m_TagString: Obstruction
@@ -93,8 +94,21 @@ MeshCollider:
   m_GameObject: {fileID: 8875004060147941270}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -3660275907326674588, guid: acaeef5458c3fd4478e54b9acd50a6a0, type: 3}
+--- !u!65 &-8092034548518690973
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8875004060147941270}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.019999998, y: 0.020000001, z: 0.02}
+  m_Center: {x: 0, y: 0, z: 0}

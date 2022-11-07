@@ -12,13 +12,17 @@ public class Silverfish_ChaseAttack : MonoBehaviour
     Silverfish_AttackState silverfish_AttackState;
     PlayerManager playerManager;
     CanRotate canRotate;
-    PlayerDetectionOneDir playerDetection;
 
     Animator animator;
 
     //Variable for storing collisions with the player used in Patrolling_State
     [HideInInspector] public GameObject col = null;
-    
+
+    float distToPlayer;
+
+    float lastPos;
+    float velocity;
+    float travelTime;
 
     void Awake()
     {
@@ -27,8 +31,6 @@ public class Silverfish_ChaseAttack : MonoBehaviour
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
         canRotate = GetComponent<CanRotate>();
         animator = GetComponent<Animator>();
-        playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
-
     }
 
     // OnEnable is called upon enabling a component
@@ -45,30 +47,34 @@ public class Silverfish_ChaseAttack : MonoBehaviour
 
         //Play Charge animation
         animator.SetTrigger("Tr_Charge");
+
+        //Start continious checks coroutine
+        StartCoroutine(ContiniousChecks());    
+    }
+
+    void Update()
+    {
+        distToPlayer = Vector3.Distance(vars.playerObject.transform.position, transform.position); 
     }
 
     void FixedUpdate()
     {
         Attack();
+
+        velocity = (vars.enemyRb.position.x - lastPos) * 50;
+        lastPos = vars.enemyRb.position.x;
+
+        //Debug.Log("velocity: " + velocity);
     }
 
     public void Attack()
     {
-        float dist = Vector3.Distance(vars.playerObject.transform.position, transform.position);
-        //Debug.Log("dist: " + dist);
-
-        //Initiate Headbutt animation at the appropriate distance
-        if (dist < vars.headbuttStartDist)
-        {
-           // Debug.Log("Headbutt");
-            
-            animator.SetTrigger("Tr_Headbutt"); 
-        }
-
+        //Check if the headbutt animation is over
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Headbutt") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !animator.IsInTransition(0))
         {
             animator.ResetTrigger("Tr_Headbutt");
             //Debug.Log("1 Headbutt animation loop over");
+            //Initiate charge animation
             animator.SetTrigger("Tr_Charge");
         }
 
@@ -97,13 +103,11 @@ public class Silverfish_ChaseAttack : MonoBehaviour
                 {
                     //Debug.Log("close to obstacle");
                     //Push the player away
-                    playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
+                    playerManager.PushPlayer(false, gameObject, vars.impactForceX, vars.impactForceY);
 
-                    //Switch to Pause state
-                    //silverfish_AttackState.goTo_Silverfish_PauseState = true;
-
-                    animator.ResetTrigger("Tr_Headbutt");
+                    //animator.ResetTrigger("Tr_Headbutt");
                     animator.ResetTrigger("Tr_Charge");
+
                     //Play Turn animation and...
                     animator.SetTrigger("Tr_Turn");
 
@@ -115,7 +119,7 @@ public class Silverfish_ChaseAttack : MonoBehaviour
                     }
 
                     //Switch to Patrolling state after waiting for the direction change
-                    StartCoroutine(StateTransitionToPatrol(0.0f));
+                    StartCoroutine(StateTransitionToPatrol(0.05f));
                 }
                 else
                 {
@@ -142,8 +146,7 @@ public class Silverfish_ChaseAttack : MonoBehaviour
                     canRotate.getTargetRotation = true;
                 }
                 //Switch to Patrolling state after waiting for the direction change
-                StartCoroutine(StateTransitionToPatrol(0.0f));
-                
+                StartCoroutine(StateTransitionToPatrol(0.05f)); 
             }
         }
     }
@@ -158,10 +161,38 @@ public class Silverfish_ChaseAttack : MonoBehaviour
         //}
     }
 
-    //IEnumerator StateTransitionToPause(float time)
-    //{
-    //    yield return new WaitForSeconds(time);
-    //    //State transition
-    //    silverfish_AttackState.goTo_Silverfish_PatrollingState = true;
-    //}
+    public IEnumerator ContiniousChecks()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(0.1f);
+
+            Vector3 playerPos = vars.playerObject.transform.position;
+            Vector3 forward = transform.TransformDirection(Vector3.forward);
+            Vector3 toPlayer = playerPos - transform.position;
+
+            //Check if the player is behind us...
+            if (Vector3.Dot(forward, toPlayer) < 0)
+            {
+                //... if it is, go to patrolling state
+                silverfish_AttackState.goTo_Silverfish_PatrollingState = true;
+                //print("The player is behind me!");   
+            }
+
+            travelTime = Mathf.Abs(distToPlayer / (velocity - vars.playerRb.velocity.x));
+            //print("travelTime: " + travelTime);
+
+            //Initiate Headbutt animation at the appropriate distance
+            if (travelTime < vars.headbuttStartDist)
+            {
+
+                //SET MINIMUM DISTANCE
+                // Debug.Log("Headbutt");
+
+                animator.SetTrigger("Tr_Headbutt");
+            }
+
+
+        }
+    }
 }

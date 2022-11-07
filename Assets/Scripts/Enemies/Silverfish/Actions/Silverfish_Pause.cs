@@ -78,7 +78,6 @@ public class Silverfish_Pause : MonoBehaviour
         else
         {
             silverfish_PauseState.goTo_Silverfish_AttackState = true;
-
         }
         
     }

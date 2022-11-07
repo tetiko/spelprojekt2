@@ -34,21 +34,19 @@ public class Silverfish_Patrol : MonoBehaviour
         vars.currentAction = GetType();
         Debug.Log("Class: " + GetType());
 
+        //Reset animation triggerr
         animator.ResetTrigger("Tr_Turn");
         animator.ResetTrigger("Tr_Charge");
+        animator.ResetTrigger("Tr_Headbutt");
+        animator.ResetTrigger("Tr_Pause");
 
         //Play Patrol animation
         animator.SetTrigger("Tr_Patrol");
-
     }
 
-    private void Update()
+    void Update()
     {
-        if(animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Turn") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !animator.IsInTransition(0))
-        {
-            Debug.Log("1 Turn animation loop over");
-            animator.SetTrigger("Tr_Patrol");
-        }
+        TurnAnimation();
     }
 
     void FixedUpdate()
@@ -63,14 +61,22 @@ public class Silverfish_Patrol : MonoBehaviour
         vars.enemyRb.MovePosition(vars.enemyRb.position + vars.enemyDir * Time.fixedDeltaTime * vars.moveSpeed);
     }
 
+    void TurnAnimation()
+    {
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Turn") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !animator.IsInTransition(0))
+        {
+            //Debug.Log("1 Turn animation loop over");
+            animator.ResetTrigger("Tr_Turn");
+            animator.SetTrigger("Tr_Patrol");
+        }
+    }
+
     public void OnCollisionEnter(Collision collision)
     {
         if (vars.patrolEnable)
         {   
-            //Debug.Log("Patrol collision");
             //Get the object we collided with
             col = collision.gameObject;
-            //Debug.Log("col: " + col);
 
             if (col.CompareTag("Player"))
             {
@@ -89,7 +95,6 @@ public class Silverfish_Patrol : MonoBehaviour
                 //Rotate the enemy
                 canRotate.rotate = true;
                 canRotate.getTargetRotation = true;
-
             }
         }
     } 

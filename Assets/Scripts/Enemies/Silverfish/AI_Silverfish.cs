@@ -41,12 +41,11 @@ public class AI_Silverfish : MonoBehaviour
     //Enemy: Patrolling Aggro Settings
     [Header("Settings for this enemy")]
     public float moveSpeed = 1f;
-    public float chaseSpeed = 4f;
-    public float jumpReactionForce = 5f;
+    public float chaseSpeed = 5f;
     public float pauseDuration = 1f;
-    public float memoryCapacity = 2f;
-    public float headbuttStartDist = 2f;
-    public float obsTurnDist = 1f;
+    public float reactDuration = 0.2f;
+    public float headbuttStartDist = 0.5f;
+    public float obsTurnDist = 1.5f;
     public bool defaultPushForces = true;
     [Header("Push Forces (Overriden if Default Push Forces is checked)")]
     public float impactForceX;
@@ -64,7 +63,6 @@ public class AI_Silverfish : MonoBehaviour
     [HideInInspector] public bool patrolEnable;
     [HideInInspector] public bool pauseEnable;
     [HideInInspector] public bool reactEnable;
-
 
     void Awake()
     {
@@ -93,16 +91,6 @@ public class AI_Silverfish : MonoBehaviour
         //Move in the local direction of the transform. Important since we will be rotating the enemy on collision with obstructions
         enemyDir = gameObject.transform.forward.normalized;
         //Debug.Log("enemyDir :" + enemyDir);
-
-        //Determine if the enemy remembers the player or not
-        //if (CanMemorize.remembering)
-        //{ 
-        //    hasMemory = true;
-        //}
-        //else
-        //{
-        //    hasMemory = false;  
-        //}
 
         //Dynamically enable/disable actions from the state scripts
         GetComponent<Silverfish_Patrol>().enabled = patrolEnable;

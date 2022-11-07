@@ -3397,16 +3397,15 @@ MonoBehaviour:
   enemyObject: {fileID: 0}
   enemyRb: {fileID: 0}
   moveSpeed: 1
-  chaseSpeed: 4
+  chaseSpeed: 5
   jumpReactionForce: 3
   pauseDuration: 1
   memoryCapacity: 1
-  headbuttStartDist: 2
+  headbuttStartDist: 2.2
   obsTurnDist: 1.5
   defaultPushForces: 1
   impactForceX: 0
   impactForceY: 0
-  usingMemory: 0
   enemyDir: {x: 0, y: 0, z: 0}
   pcScript: {fileID: 0}
   chaseAttackEnable: 0
