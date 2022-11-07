@@ -26,6 +26,8 @@ public class Silverfish_React : MonoBehaviour
         vars.currentAction = GetType();
         Debug.Log("Class: " + GetType());
 
+        animator.ResetTrigger("Tr_Patrol");
+
         //Go directly into the Reacting function
         Reacting();
     }
@@ -40,7 +42,7 @@ public class Silverfish_React : MonoBehaviour
             animator.SetTrigger("Tr_React");
         }
 
-        StartCoroutine(StateTransition(0.5f));
+        StartCoroutine(StateTransition(vars.reactDuration));
     }
 
     IEnumerator StateTransition(float time)

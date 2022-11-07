@@ -5,21 +5,19 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public bool gameOver = false, disableMovement = false;
+    //Access external scripts
+    PlayerManager playerManager;
+
+    [HideInInspector] public bool gameOver = false, disableMovement = false, disableJump = false;
 
     private Animator playerAnim;
     private AudioSource playerAudio;
     public AudioClip jumpSound;
 
-    [Header("Default forces applied to player upon taking damage:")]
-    public float impactForceX;
-    public float impactForceY;
-
-
-    private Rigidbody rbody; // Appliceras på PlayerGameObject i inspektorn   
+    [HideInInspector] public Rigidbody rbody; // Appliceras på PlayerGameObject i inspektorn   
 
     // ----------- Variabler för Character Horizonal Movement (X-axis) ---------
-    [Header("Movement Settings:")] // Skapar en header i inspektorn för publika inställningar
+    [Header("Movement Settings")] // Skapar en header i inspektorn för publika inställningar
     public float moveSpeed = 20f; // Rörelsehastigheten, går att ändra i inspektorn
 
     // ------- Variabler för Character Jump (Y-axis) --------------------
@@ -35,8 +33,23 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundLayer; // Sätts i inspektorn
     public float groundRadius = 0.2f; // Hur stort avståndet är i GroundDetecting
 
+    [Header("Default forces applied to player upon taking damage")]
+    public float impactForceX;
+    public float impactForceY;
+
+    // ------- Variabler för hazards och interactables som påverkar spelarens movement --------------------
+    [Header("Hazards and Interactables")]
+    public float bounceForceX;
+    public float bounceForceY;
+    public float webbedMoveSpeed = 1;
+    public float oilMoveSpeed;
+
+    public float vel;
+    public float inp;
+
     private void Awake()
     {
+        playerManager = GetComponent<PlayerManager>();
         rbody = GetComponent<Rigidbody>();
 
         //Get the Animator component from the Player object that PlayerController is attached to, and store it in the variable playerAnim
@@ -48,7 +61,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && !disableMovement && IsGrounded() && !gameOver)
+        if (Input.GetKeyDown(KeyCode.Space) && !disableMovement && !disableJump && IsGrounded() && !gameOver)
         {
             Jump();
         }
@@ -58,7 +71,8 @@ public class PlayerController : MonoBehaviour
             Move();
         }
 
-        //Debug.Log("IsGrounded(): " + IsGrounded()); 
+        vel = rbody.velocity.x;
+        inp = Input.GetAxis("Horizontal");
     }
 
     private void Jump()
@@ -88,9 +102,35 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        Vector3 input = new Vector3(Input.GetAxis("Horizontal"), rbody.velocity.y);
-        rbody.velocity = new Vector3(input.x * moveSpeed, input.y);
+        if (!playerManager.slippery)
+        {
+            Vector3 input = new Vector3(Input.GetAxis("Horizontal"), rbody.velocity.y);
+            rbody.velocity = new Vector3(input.x * moveSpeed, input.y);        
+        }
+        else
+        {
+            if (Input.GetButton("Horizontal"))
+            {q
+                print("pressed");
+                playerManager.glide = false;
+                if (!playerManager.glide)
+                {
+                    rbody.velocity = new Vector3(Mathf.Lerp(rbody.velocity.x, oilMoveSpeed, Input.GetAxis("Horizontal")), rbody.velocity.y);
+                }
+            }
+            else if (!Input.GetButton("Horizontal"))
+            {
+                print("released");
+                playerManager.glide = true;
+            }
+
+
+        }
     }
+
+
+
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.blue;
