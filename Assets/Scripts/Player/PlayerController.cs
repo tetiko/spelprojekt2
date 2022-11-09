@@ -14,30 +14,30 @@ public class PlayerController : MonoBehaviour
     private AudioSource playerAudio;
     public AudioClip jumpSound;
 
-    [HideInInspector] public Rigidbody rbody; // Appliceras på PlayerGameObject i inspektorn   
+    [HideInInspector] public Rigidbody rbody; // Appliceras pï¿½ PlayerGameObject i inspektorn   
 
-    // ----------- Variabler för Character Horizonal Movement (X-axis) ---------
-    [Header("Movement Settings")] // Skapar en header i inspektorn för publika inställningar
-    public float moveSpeed = 20f; // Rörelsehastigheten, går att ändra i inspektorn
+    // ----------- Variabler fï¿½r Character Horizonal Movement (X-axis) ---------
+    [Header("Movement Settings")] // Skapar en header i inspektorn fï¿½r publika instï¿½llningar
+    public float moveSpeed = 20f; // Rï¿½relsehastigheten, gï¿½r att ï¿½ndra i inspektorn
 
-    // ------- Variabler för Character Jump (Y-axis) --------------------
+    // ------- Variabler fï¿½r Character Jump (Y-axis) --------------------
     public float jumpForce = 80;
 
-    // -------------------- Variabler för ett mindre floaty hopp --------------------
+    // -------------------- Variabler fï¿½r ett mindre floaty hopp --------------------
     public float fallMultiplier = 1.5f;
     public float lowJumpMultiplier = 2f;
 
-    // ------- Variabler för Ground Checking (så du inte kan hoppa in luften, utan enbart när du är grounded --------------------
+    // ------- Variabler fï¿½r Ground Checking (sï¿½ du inte kan hoppa in luften, utan enbart nï¿½r du ï¿½r grounded --------------------
     [Header("Settings for Ground Checking")]
-    public Transform groundCheck; // Sätts i inspektorn, i detta fall ett tomt GameObject i botten av karaktären
-    public LayerMask groundLayer; // Sätts i inspektorn
-    public float groundRadius = 0.2f; // Hur stort avståndet är i GroundDetecting
+    public Transform groundCheck; // Sï¿½tts i inspektorn, i detta fall ett tomt GameObject i botten av karaktï¿½ren
+    public LayerMask groundLayer; // Sï¿½tts i inspektorn
+    public float groundRadius = 0.2f; // Hur stort avstï¿½ndet ï¿½r i GroundDetecting
 
     [Header("Default forces applied to player upon taking damage")]
     public float impactForceX;
     public float impactForceY;
 
-    // ------- Variabler för hazards och interactables som påverkar spelarens movement --------------------
+    // ------- Variabler fï¿½r hazards och interactables som pï¿½verkar spelarens movement --------------------
     [Header("Hazards and Interactables")]
     public float bounceForceX;
     public float bounceForceY;
