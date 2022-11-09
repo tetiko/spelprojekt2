@@ -14,7 +14,7 @@ public class PlayerManager : MonoBehaviour
     Rigidbody playerRb;
     Rigidbody enemyRb;
 
-    [HideInInspector] public bool forceAdded = false;
+    [HideInInspector] public bool forceAdded = false, bouncing = false;
     public bool slippery = false, glide = false;
     public Vector3 initialGlideVel;
     public Vector3 initialOilVel;
@@ -97,6 +97,7 @@ public class PlayerManager : MonoBehaviour
             playerRb.velocity = Vector3.zero;
             pcScript.disableMovement = false;
             forceAdded = false;
+            bouncing = false;
             //Debug.Log("Landed after push");
         }
     }
@@ -123,17 +124,12 @@ public class PlayerManager : MonoBehaviour
                 initialGlideVel = playerRb.velocity;
                 playerRb.velocity = new Vector3(initialGlideVel.x, playerRb.velocity.y);
             }
-            //else if (!glide)
-            //{
-            //    initialOilVel = playerRb.velocity;
-                
-            //}
-            
+      
         }
 
         if (other.name == "Bouncy Area")
         {
-            float velX = playerRb.velocity.x;
+            float velX = playerRb.velocity.x / 2;
             pcScript.disableMovement = true;
             playerRb.AddForce(new Vector3(velX * pcScript.bounceForceX, pcScript.bounceForceY), ForceMode.Impulse);
             StartCoroutine(Trampoline(0.05f));
@@ -144,6 +140,8 @@ public class PlayerManager : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
         forceAdded = true;
+        bouncing = true;
+
     }
 
     private void OnTriggerExit(Collider other)

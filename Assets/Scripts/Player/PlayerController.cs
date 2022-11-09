@@ -41,8 +41,9 @@ public class PlayerController : MonoBehaviour
     [Header("Hazards and Interactables")]
     public float bounceForceX;
     public float bounceForceY;
-    public float webbedMoveSpeed = 1;
-    public float oilMoveSpeed;
+    public float bounceControl = 2f;
+    public float webbedMoveSpeed = 1f;
+    public float oilMoveSpeed = 1.5f;
 
     public float vel;
     public float inp;
@@ -66,9 +67,13 @@ public class PlayerController : MonoBehaviour
             Jump();
         }
 
-        if (!disableMovement)
+        if (!disableMovement && !playerManager.bouncing)
         {
             Move();
+        }
+        else if (playerManager.bouncing)
+        {
+            BounceControl();
         }
 
         vel = rbody.velocity.x;
@@ -102,6 +107,7 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
+        //If walking on non slippery material
         if (!playerManager.slippery)
         {
             Vector3 input = new Vector3(Input.GetAxis("Horizontal"), rbody.velocity.y);
@@ -109,26 +115,27 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            //Stop gliding upon controller input
             if (Input.GetButton("Horizontal"))
-            {q
-                print("pressed");
+            {
                 playerManager.glide = false;
-                if (!playerManager.glide)
-                {
-                    rbody.velocity = new Vector3(Mathf.Lerp(rbody.velocity.x, oilMoveSpeed, Input.GetAxis("Horizontal")), rbody.velocity.y);
-                }
+
+                //If player is not gliding, lerp velocity to make the surface seem slippery
+                rbody.velocity = new Vector3(Mathf.Lerp(rbody.velocity.x, oilMoveSpeed, Input.GetAxis("Horizontal")), rbody.velocity.y); 
             }
+            //Glide if there's no controller input
             else if (!Input.GetButton("Horizontal"))
             {
-                print("released");
                 playerManager.glide = true;
             }
-
-
         }
     }
 
-
+    private void BounceControl()
+    {
+        Vector3 input = new Vector3(Input.GetAxis("Horizontal") * bounceControl, 0);
+        rbody.AddForce(input, ForceMode.Force);
+    }
 
 
     void OnDrawGizmosSelected()
