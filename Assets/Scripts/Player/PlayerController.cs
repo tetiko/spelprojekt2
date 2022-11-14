@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class PlayerController : MonoBehaviour
 {
@@ -42,11 +43,14 @@ public class PlayerController : MonoBehaviour
     public float bounceForceX;
     public float bounceForceY;
     public float bounceControl = 2f;
-    public float webbedMoveSpeed = 1f;
-    public float oilMoveSpeed = 1.5f;
+    public float slowedMoveSpeed = 1f;
+    public float slipperyMoveSpeed = 1.5f;
+    public float slipperyTurnSpeed = 0.2f;
+    public float glideThrottle = 0.005f;
 
     public float vel;
     public float inp;
+
 
     private void Awake()
     {
@@ -111,24 +115,34 @@ public class PlayerController : MonoBehaviour
         if (!playerManager.slippery)
         {
             Vector3 input = new Vector3(Input.GetAxis("Horizontal"), rbody.velocity.y);
-            rbody.velocity = new Vector3(input.x * moveSpeed, input.y);        
+            rbody.velocity = new Vector3(input.x * moveSpeed, input.y);
         }
-        else
+
+        else if (playerManager.slippery)
         {
-            //Stop gliding upon controller input
+            //If player is not gliding, lerp velocity to make the surface seem slippery
             if (Input.GetButton("Horizontal"))
             {
-                playerManager.glide = false;
-
-                //If player is not gliding, lerp velocity to make the surface seem slippery
-                rbody.velocity = new Vector3(Mathf.Lerp(rbody.velocity.x, oilMoveSpeed, Input.GetAxis("Horizontal")), rbody.velocity.y); 
+                float velX = rbody.velocity.x;
+                Vector3 input = new Vector3(Input.GetAxis("Horizontal"), rbody.velocity.y);
+                Vector3 vel =  new Vector3(Mathf.MoveTowards(velX, input.x * slipperyMoveSpeed, slipperyTurnSpeed), input.y);
+                rbody.velocity = vel;
             }
+
             //Glide if there's no controller input
             else if (!Input.GetButton("Horizontal"))
             {
-                playerManager.glide = true;
+                Glide();
             }
+
         }
+    }
+
+    void Glide()
+    {
+        float velX = rbody.velocity.x;
+        rbody.velocity = new Vector3(Mathf.MoveTowards(velX, 0, glideThrottle), rbody.velocity.y);
+
     }
 
     private void BounceControl()
