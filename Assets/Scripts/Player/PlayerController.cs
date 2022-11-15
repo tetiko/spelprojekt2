@@ -142,7 +142,6 @@ public class PlayerController : MonoBehaviour
     {
         float velX = rbody.velocity.x;
         rbody.velocity = new Vector3(Mathf.MoveTowards(velX, 0, glideThrottle), rbody.velocity.y);
-
     }
 
     private void BounceControl()

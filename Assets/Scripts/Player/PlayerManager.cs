@@ -15,8 +15,8 @@ public class PlayerManager : MonoBehaviour
     Rigidbody playerRb;
     Rigidbody enemyRb;
 
-    [HideInInspector] public bool forceAdded = false, bouncing = false, invulnerable = false;
-    public bool slippery = false;
+    [HideInInspector] public bool forceAdded = false, bouncing = false, slippery = false;
+    public bool invulnerable = false;
 
     Material material;
 
@@ -39,7 +39,7 @@ public class PlayerManager : MonoBehaviour
         //if (dealDamage)
         //{
             //Make the player briefly invulnurable after taking damage
-            StartCoroutine(Invulnerable(5f));
+            StartCoroutine(Invulnerable(3f));
         //}
 
         //Disable movement and set velocity to zero to stop player velocity from affecting the push force
@@ -100,19 +100,17 @@ public class PlayerManager : MonoBehaviour
         if (invulnerable)
         {
             //Make the player blink to signal invulnerability
-            material.DOColor(Color.red, 1).From();
-            material.DOColor(Color.green, 1).From();
-            material.DOColor(Color.red, 1).From();
-            material.DOColor(Color.green, 1).From();
-            material.DOColor(Color.red, 1).From();
-            material.DOColor(Color.green, 1).From();
-            material.DOColor(Color.red, 1).From();
-
+            material.DOColor(Color.red, 1).From().SetLoops(3);
         }
 
         //Turn off invulnurability
         yield return new WaitForSeconds(time);
         invulnerable = false;
+
+        if (!invulnerable)
+        {
+            material.DOColor(Color.green, 0);
+        }
     }
 
         void OnCollisionEnter(Collision collision)
