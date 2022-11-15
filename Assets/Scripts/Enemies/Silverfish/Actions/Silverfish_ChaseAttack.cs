@@ -101,7 +101,6 @@ public class Silverfish_ChaseAttack : MonoBehaviour
                 //Change direction and switch to patrol if the enemy is close to an obstruction to avoid hitting the player multiple times
                 if (dist < vars.obsTurnDist)
                 {
-                    //Debug.Log("close to obstacle");
                     //Push the player away
                     playerManager.PushPlayer(false, gameObject, vars.impactForceX, vars.impactForceY);
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class PlayerController : MonoBehaviour
 {
@@ -14,38 +15,42 @@ public class PlayerController : MonoBehaviour
     private AudioSource playerAudio;
     public AudioClip jumpSound;
 
-    [HideInInspector] public Rigidbody rbody; // Appliceras på PlayerGameObject i inspektorn   
+    [HideInInspector] public Rigidbody rbody; // Appliceras pï¿½ PlayerGameObject i inspektorn   
 
-    // ----------- Variabler för Character Horizonal Movement (X-axis) ---------
-    [Header("Movement Settings")] // Skapar en header i inspektorn för publika inställningar
-    public float moveSpeed = 20f; // Rörelsehastigheten, går att ändra i inspektorn
+    // ----------- Variabler fï¿½r Character Horizonal Movement (X-axis) ---------
+    [Header("Movement Settings")] // Skapar en header i inspektorn fï¿½r publika instï¿½llningar
+    public float moveSpeed = 20f; // Rï¿½relsehastigheten, gï¿½r att ï¿½ndra i inspektorn
 
-    // ------- Variabler för Character Jump (Y-axis) --------------------
+    // ------- Variabler fï¿½r Character Jump (Y-axis) --------------------
     public float jumpForce = 80;
 
-    // -------------------- Variabler för ett mindre floaty hopp --------------------
+    // -------------------- Variabler fï¿½r ett mindre floaty hopp --------------------
     public float fallMultiplier = 1.5f;
     public float lowJumpMultiplier = 2f;
 
-    // ------- Variabler för Ground Checking (så du inte kan hoppa in luften, utan enbart när du är grounded --------------------
+    // ------- Variabler fï¿½r Ground Checking (sï¿½ du inte kan hoppa in luften, utan enbart nï¿½r du ï¿½r grounded --------------------
     [Header("Settings for Ground Checking")]
-    public Transform groundCheck; // Sätts i inspektorn, i detta fall ett tomt GameObject i botten av karaktären
-    public LayerMask groundLayer; // Sätts i inspektorn
-    public float groundRadius = 0.2f; // Hur stort avståndet är i GroundDetecting
+    public Transform groundCheck; // Sï¿½tts i inspektorn, i detta fall ett tomt GameObject i botten av karaktï¿½ren
+    public LayerMask groundLayer; // Sï¿½tts i inspektorn
+    public float groundRadius = 0.2f; // Hur stort avstï¿½ndet ï¿½r i GroundDetecting
 
     [Header("Default forces applied to player upon taking damage")]
     public float impactForceX;
     public float impactForceY;
 
-    // ------- Variabler för hazards och interactables som påverkar spelarens movement --------------------
+    // ------- Variabler fï¿½r hazards och interactables som pï¿½verkar spelarens movement --------------------
     [Header("Hazards and Interactables")]
     public float bounceForceX;
     public float bounceForceY;
-    public float webbedMoveSpeed = 1;
-    public float oilMoveSpeed;
+    public float bounceControl = 2f;
+    public float slowedMoveSpeed = 1f;
+    public float slipperyMoveSpeed = 1.5f;
+    public float slipperyTurnSpeed = 0.2f;
+    public float glideThrottle = 0.005f;
 
     public float vel;
     public float inp;
+
 
     private void Awake()
     {
@@ -66,9 +71,13 @@ public class PlayerController : MonoBehaviour
             Jump();
         }
 
-        if (!disableMovement)
+        if (!disableMovement && !playerManager.bouncing)
         {
             Move();
+        }
+        else if (playerManager.bouncing)
+        {
+            BounceControl();
         }
 
         vel = rbody.velocity.x;
@@ -102,33 +111,44 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
+        //If walking on non slippery material
         if (!playerManager.slippery)
         {
             Vector3 input = new Vector3(Input.GetAxis("Horizontal"), rbody.velocity.y);
-            rbody.velocity = new Vector3(input.x * moveSpeed, input.y);        
+            rbody.velocity = new Vector3(input.x * moveSpeed, input.y);
         }
-        else
+
+        else if (playerManager.slippery)
         {
+            //If player is not gliding, lerp velocity to make the surface seem slippery
             if (Input.GetButton("Horizontal"))
-            {q
-                print("pressed");
-                playerManager.glide = false;
-                if (!playerManager.glide)
-                {
-                    rbody.velocity = new Vector3(Mathf.Lerp(rbody.velocity.x, oilMoveSpeed, Input.GetAxis("Horizontal")), rbody.velocity.y);
-                }
-            }
-            else if (!Input.GetButton("Horizontal"))
             {
-                print("released");
-                playerManager.glide = true;
+                float velX = rbody.velocity.x;
+                Vector3 input = new Vector3(Input.GetAxis("Horizontal"), rbody.velocity.y);
+                Vector3 vel =  new Vector3(Mathf.MoveTowards(velX, input.x * slipperyMoveSpeed, slipperyTurnSpeed), input.y);
+                rbody.velocity = vel;
             }
 
+            //Glide if there's no controller input
+            else if (!Input.GetButton("Horizontal"))
+            {
+                Glide();
+            }
 
         }
     }
 
+    void Glide()
+    {
+        float velX = rbody.velocity.x;
+        rbody.velocity = new Vector3(Mathf.MoveTowards(velX, 0, glideThrottle), rbody.velocity.y);
+    }
 
+    private void BounceControl()
+    {
+        Vector3 input = new Vector3(Input.GetAxis("Horizontal") * bounceControl, 0);
+        rbody.AddForce(input, ForceMode.Force);
+    }
 
 
     void OnDrawGizmosSelected()
