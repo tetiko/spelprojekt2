@@ -31,16 +31,29 @@ public class PlayerManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //ResetPush();
+        if (!invulnerable)
+        {
+            material.DOColor(Color.green, 0);
+        }
     }
 
     public void PushPlayer(bool defaultPushForces, GameObject forceSource, float customXForce, float customYForce)
     {
+
+        //if (dealDamage)
+        //{
+            //Make the player briefly invulnurable after taking damage
+            StartCoroutine(Invulnerable(2f));
+
+
+        //}
+
         //if (dealDamage)
         //{
             //Make the player briefly invulnurable after taking damage
             StartCoroutine(Invulnerable(3f));
         //}
+
 
         //Disable movement and set velocity to zero to stop player velocity from affecting the push force
         pcScript.disableMovement = true;
@@ -93,20 +106,36 @@ public class PlayerManager : MonoBehaviour
         forceAdded = true;   
     }
 
+
+    void OnCollisionEnter(Collision collision)
+
+
     public IEnumerator Invulnerable(float time)
     {
         invulnerable = true;
+
+
+        if (invulnerable)
+        {
+            //Make the player blink to signal invulnerability
+            material.DOColor(Color.red, 1).From().SetLoops(2, LoopType.Restart);
 
         if (invulnerable)
         {
             //Make the player blink to signal invulnerability
             material.DOColor(Color.red, 1).From().SetLoops(3);
+
         }
 
         //Turn off invulnurability
         yield return new WaitForSeconds(time);
         invulnerable = false;
 
+
+
+    }
+
+        void OnCollisionEnter(Collision collision)
         if (!invulnerable)
         {
             material.DOColor(Color.green, 0);
