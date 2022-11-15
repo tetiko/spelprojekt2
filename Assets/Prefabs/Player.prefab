@@ -84,7 +84,7 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1987269571431382492}
   m_Enabled: 1
---- !u!1 &5272958691271801504
+--- !u!1 &5223925334923750808
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,7 +92,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5272958691271801507}
+  - component: {fileID: 6758977444708678436}
   m_Layer: 0
   m_Name: groundCheck
   m_TagString: Untagged
@@ -100,16 +100,16 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5272958691271801507
+--- !u!4 &6758977444708678436
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5272958691271801504}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.34, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_GameObject: {fileID: 5223925334923750808}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 318.1621, y: 92.65454, z: -135.96463}
+  m_LocalScale: {x: 1.0089188, y: 1.0089188, z: 1.0089188}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5272958692192524004}
@@ -149,7 +149,7 @@ Transform:
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 5272958691271801507}
+  - {fileID: 6758977444708678436}
   - {fileID: 1987269571431382493}
   m_Father: {fileID: 5272958692728346795}
   m_RootOrder: 0
@@ -247,18 +247,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameOver: 0
   disableMovement: 0
+  disableJump: 0
   jumpSound: {fileID: 0}
-  impactForceX: 3
-  impactForceY: 5
+  rbody: {fileID: 0}
   moveSpeed: 2
   jumpForce: 8
   fallMultiplier: 1.5
   lowJumpMultiplier: 2
-  groundCheck: {fileID: 5272958691271801507}
+  groundCheck: {fileID: 0}
   groundLayer:
     serializedVersion: 2
     m_Bits: 192
   groundRadius: 0.1
+  impactForceX: 3
+  impactForceY: 5
+  bounceForceX: 0
+  bounceForceY: 0
+  bounceControl: 2
+  webbedMoveSpeed: 1
+  oilMoveSpeed: 1.5
+  vel: 0
+  inp: 0
 --- !u!114 &5272958692192524029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -271,6 +280,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 849df9723a88c1543a847b56dfb250c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  forceAdded: 0
+  bouncing: 0
+  slippery: 0
+  glide: 0
+  initialGlideVel: {x: 0, y: 0, z: 0}
+  initialOilVel: {x: 0, y: 0, z: 0}
 --- !u!1 &5272958692728346792
 GameObject:
   m_ObjectHideFlags: 0
