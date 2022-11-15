@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-
 public class PlayerManager : MonoBehaviour
 {
     //Access external scripts
@@ -15,8 +14,12 @@ public class PlayerManager : MonoBehaviour
     Rigidbody playerRb;
     Rigidbody enemyRb;
 
-    [HideInInspector] public bool forceAdded = false, bouncing = false, slippery = false;
-    public bool invulnerable = false;
+    [HideInInspector] public bool forceAdded = false;
+    public bool slippery = false, glide = false, invulnerable = false, bouncing = false;
+    public Vector3 initialGlideVel;
+    public Vector3 initialOilVel;
+
+
 
     Material material;
 
@@ -31,7 +34,10 @@ public class PlayerManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //ResetPush();
+        if (!invulnerable)
+        {
+            material.DOColor(Color.green, 0);
+        }
     }
 
     public void PushPlayer(bool defaultPushForces, GameObject forceSource, float customXForce, float customYForce)
@@ -39,7 +45,8 @@ public class PlayerManager : MonoBehaviour
         //if (dealDamage)
         //{
             //Make the player briefly invulnurable after taking damage
-            StartCoroutine(Invulnerable(3f));
+            StartCoroutine(Invulnerable(2f));
+
         //}
 
         //Disable movement and set velocity to zero to stop player velocity from affecting the push force
@@ -90,7 +97,7 @@ public class PlayerManager : MonoBehaviour
         //Reset variables
         playerRb.useGravity = true;
         enemyRb.isKinematic = false;
-        forceAdded = true;   
+        forceAdded = true;
     }
 
     public IEnumerator Invulnerable(float time)
@@ -100,20 +107,21 @@ public class PlayerManager : MonoBehaviour
         if (invulnerable)
         {
             //Make the player blink to signal invulnerability
-            material.DOColor(Color.red, 1).From().SetLoops(3);
+            material.DOColor(Color.red, 1).From().SetLoops(2, LoopType.Restart);
         }
 
         //Turn off invulnurability
         yield return new WaitForSeconds(time);
         invulnerable = false;
 
-        if (!invulnerable)
+        if (invulnerable)
         {
             material.DOColor(Color.green, 0);
         }
+
     }
 
-        void OnCollisionEnter(Collision collision)
+    void OnCollisionEnter(Collision collision)
     {
         GameObject colObject = collision.gameObject;
         LayerMask colMask = collision.gameObject.layer;
@@ -135,21 +143,21 @@ public class PlayerManager : MonoBehaviour
     {
         if (other.name == "Spiderweb")
         {
+            pcScript.disableJump = true;
             resetMoveSpeed = pcScript.moveSpeed;
             pcScript.moveSpeed = pcScript.slowedMoveSpeed;
-            pcScript.disableJump = true;
         }
 
         if (other.name == "Oil Spill")
         {
             resetMoveSpeed = pcScript.moveSpeed;
             pcScript.moveSpeed = pcScript.slipperyMoveSpeed;
-            slippery = true;
+            slippery = true;         
         }
 
         if (other.name == "Bouncy Area")
         {
-            float velX = playerRb.velocity.x / 2;
+            float velX = playerRb.velocity.x;
             pcScript.disableMovement = true;
             playerRb.AddForce(new Vector3(velX * pcScript.bounceForceX, pcScript.bounceForceY), ForceMode.Impulse);
             StartCoroutine(Trampoline(0.05f));
@@ -157,10 +165,11 @@ public class PlayerManager : MonoBehaviour
     }
 
     IEnumerator Trampoline(float time)
-    {
+    { 
+        bouncing = true;
+  
         yield return new WaitForSeconds(time);
         forceAdded = true;
-        bouncing = true;
     }
 
     private void OnTriggerExit(Collider other)
@@ -172,12 +181,11 @@ public class PlayerManager : MonoBehaviour
         }
 
         if (other.name == "Oil Spill")
-        {
-            slippery = false;
+        {  
             pcScript.moveSpeed = resetMoveSpeed;
-            
+            slippery = false;
         }
     }
 
-    
+
 }
