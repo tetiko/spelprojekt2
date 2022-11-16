@@ -44,9 +44,9 @@ public class PlayerManager : MonoBehaviour
     {
         //if (dealDamage)
         //{
-            //Make the player briefly invulnurable after taking damage
-            StartCoroutine(Invulnerable(2f));
-
+        //Make the player briefly invulnurable after taking damage
+        //StartCoroutine(Invulnerable(2f));
+        InvokeRepeating("Invulnerable", 0, 0.5f);
         //}
 
         //Disable movement and set velocity to zero to stop player velocity from affecting the push force
@@ -100,26 +100,34 @@ public class PlayerManager : MonoBehaviour
         forceAdded = true;
     }
 
-    public IEnumerator Invulnerable(float time)
+    void Invulnerable()
     {
-        invulnerable = true;
-
-        if (invulnerable)
-        {
-            //Make the player blink to signal invulnerability
-            material.DOColor(Color.red, 1).From().SetLoops(2, LoopType.Restart);
-        }
-
-        //Turn off invulnurability
-        yield return new WaitForSeconds(time);
-        invulnerable = false;
-
-        if (invulnerable)
-        {
-            material.DOColor(Color.green, 0);
-        }
 
     }
+    //public IEnumerator Invulnerable(float time)
+    //{
+    //    invulnerable = true;
+
+    //    if (invulnerable)
+    //    {
+    //        //Make the player blink to signal invulnerability
+    //        material.DOColor(Color.red, 0.5f).From();
+    //        yield return new WaitForSeconds(0.5f);
+    //        material.DOColor(Color.red, 0.5f).From();
+    //    }
+
+    //    //Turn off invulnurability
+    //    yield return new WaitForSeconds(time);
+    //    invulnerable = false;
+
+    //    if (!invulnerable)
+    //    {
+    //        material.DOColor(Color.green, 0);
+    //    }
+
+    //}
+
+    
 
     void OnCollisionEnter(Collision collision)
     {
