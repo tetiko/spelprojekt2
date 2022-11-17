@@ -103,7 +103,8 @@ public class Silverfish_ChaseAttack : MonoBehaviour
                 {
                     //Push the player away
                     playerManager.PushPlayer(false, gameObject, vars.impactForceX, vars.impactForceY);
-
+                    //Deal damage
+                    playerManager.PlayerTakesDamage(1);
                     //animator.ResetTrigger("Tr_Headbutt");
                     animator.ResetTrigger("Tr_Charge");
 
@@ -124,6 +125,8 @@ public class Silverfish_ChaseAttack : MonoBehaviour
                 {
                     //Push the player away
                     playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
+                    //Deal damage
+                    playerManager.PlayerTakesDamage(1);
                     //Switch to Pause state
                     silverfish_AttackState.goTo_Silverfish_PauseState = true;
                     //Debug.Log("ChaseAttack collision with Player");

@@ -82,6 +82,8 @@ public class Silverfish_Patrol : MonoBehaviour
             {
                 //Push the player
                 playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
+                //Deal damage
+                playerManager.PlayerTakesDamage(1);
             }
 
             if (col.CompareTag("Obstruction") && !canRotate.rotate)

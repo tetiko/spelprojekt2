@@ -61,6 +61,8 @@ public class Silverfish_React : MonoBehaviour
             {
                 //Push the player away
                 playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
+                //Deal damage
+                playerManager.PlayerTakesDamage(1);
                 //... initiate state transition to pause state
                 silverfish_ReactionState.goTo_Silverfish_AttackState = true;
             }

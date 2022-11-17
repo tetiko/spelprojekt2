@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+
 public class PlayerManager : MonoBehaviour
 {
     //Access external scripts
@@ -15,11 +16,16 @@ public class PlayerManager : MonoBehaviour
     Rigidbody enemyRb;
 
     [HideInInspector] public bool forceAdded = false;
-    public bool slippery = false, glide = false, invulnerable = false, bouncing = false;
-    public Vector3 initialGlideVel;
-    public Vector3 initialOilVel;
+    [HideInInspector] public bool slippery = false;
+    [HideInInspector] public bool glide = false;
+    [HideInInspector] public bool invulnerable = false;
+    [HideInInspector] public bool bouncing = false;
+    [HideInInspector] public bool gameOver = false;
 
-
+    public int invulnerableDuration = 3;
+    public GameObject[] lives;
+    int life;
+   
 
     Material material;
 
@@ -29,26 +35,13 @@ public class PlayerManager : MonoBehaviour
         pcScript = GetComponent<PlayerController>();
         playerRb = GetComponent<Rigidbody>();
         material = GetComponent<Renderer>().material;
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (!invulnerable)
-        {
-            material.DOColor(Color.green, 0);
-        }
+        //Set lives
+        life = lives.Length;
     }
 
     public void PushPlayer(bool defaultPushForces, GameObject forceSource, float customXForce, float customYForce)
     {
-        //if (dealDamage)
-        //{
-        //Make the player briefly invulnurable after taking damage
-        //StartCoroutine(Invulnerable(2f));
-        InvokeRepeating("Invulnerable", 0, 0.5f);
-        //}
-
         //Disable movement and set velocity to zero to stop player velocity from affecting the push force
         pcScript.disableMovement = true;
         playerRb.velocity = Vector3.zero;
@@ -100,34 +93,44 @@ public class PlayerManager : MonoBehaviour
         forceAdded = true;
     }
 
-    void Invulnerable()
+    public void PlayerTakesDamage(int dmg)
     {
+        if (life >= 1 && invulnerable == false)
+        {
+            life -= dmg;
+            
+            Destroy(lives[life].gameObject);
+            Invulnerable();
 
+            if (life < 1)
+            {
+                GameOver();
+            }
+        }
     }
-    //public IEnumerator Invulnerable(float time)
-    //{
-    //    invulnerable = true;
 
-    //    if (invulnerable)
-    //    {
-    //        //Make the player blink to signal invulnerability
-    //        material.DOColor(Color.red, 0.5f).From();
-    //        yield return new WaitForSeconds(0.5f);
-    //        material.DOColor(Color.red, 0.5f).From();
-    //    }
+    public void Invulnerable()
+    {
+        StartCoroutine(InvulnerableTimer(invulnerableDuration));
+        material.DOColor(Color.red, 0.5f).SetLoops(invulnerableDuration * 2, LoopType.Yoyo);
+    }
 
-    //    //Turn off invulnurability
-    //    yield return new WaitForSeconds(time);
-    //    invulnerable = false;
+    public IEnumerator InvulnerableTimer(float time)
+    {
+        invulnerable = true;
 
-    //    if (!invulnerable)
-    //    {
-    //        material.DOColor(Color.green, 0);
-    //    }
+        yield return new WaitForSeconds(time);
+        //Turn off invulnurability
+        invulnerable = false;
+    }
 
-    //}
+    public void GameOver()
+    {
+        gameOver = true;
+        print("GAME OVER :-(");
+    }
 
-    
+
 
     void OnCollisionEnter(Collision collision)
     {
