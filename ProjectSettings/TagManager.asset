@@ -5,7 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Obstruction
-  - Jump Reaction
+  - Enemy
   layers:
   - Default
   - TransparentFX

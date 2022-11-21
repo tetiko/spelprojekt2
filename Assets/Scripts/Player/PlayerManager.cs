@@ -8,6 +8,9 @@ public class PlayerManager : MonoBehaviour
 {
     //Access external scripts
     PlayerController pcScript;
+    ScreenShake shake;
+
+    public GameObject playerCamera;
 
     float resetMoveSpeed;
 
@@ -18,7 +21,7 @@ public class PlayerManager : MonoBehaviour
     [HideInInspector] public bool forceAdded = false;
     [HideInInspector] public bool slippery = false;
     [HideInInspector] public bool glide = false;
-    [HideInInspector] public bool invulnerable = false;
+    public bool invulnerable = false;
     [HideInInspector] public bool bouncing = false;
     [HideInInspector] public bool gameOver = false;
 
@@ -35,6 +38,7 @@ public class PlayerManager : MonoBehaviour
         pcScript = GetComponent<PlayerController>();
         playerRb = GetComponent<Rigidbody>();
         material = GetComponent<Renderer>().material;
+        shake = playerCamera.GetComponent<ScreenShake>();
 
         //Set lives
         life = lives.Length;
@@ -93,15 +97,24 @@ public class PlayerManager : MonoBehaviour
         forceAdded = true;
     }
 
+    //If the player takes damage
     public void PlayerTakesDamage(int dmg)
     {
-        if (life >= 1 && invulnerable == false)
+        //If the player has 1 or more lives and is not invulnerable
+        if (life >= 1 && !invulnerable)
         {
+            //Player takes x amount of damage
             life -= dmg;
-            
+            //Destroy x amount of sprite representation(s) of a life
             Destroy(lives[life].gameObject);
+
+            //Shake the camera
+            shake.Shake();
+
+            //Make the player briefly invulnerable
             Invulnerable();
 
+            //If the player has no lives left, end the game
             if (life < 1)
             {
                 GameOver();
@@ -111,7 +124,9 @@ public class PlayerManager : MonoBehaviour
 
     public void Invulnerable()
     {
+        //Start invulnerable coroutine
         StartCoroutine(InvulnerableTimer(invulnerableDuration));
+        //Blink the material color of the player to indicate damage and subsequent invulnerability
         material.DOColor(Color.red, 0.5f).SetLoops(invulnerableDuration * 2, LoopType.Yoyo);
     }
 
@@ -129,8 +144,6 @@ public class PlayerManager : MonoBehaviour
         gameOver = true;
         print("GAME OVER :-(");
     }
-
-
 
     void OnCollisionEnter(Collision collision)
     {
