@@ -9,7 +9,9 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: M_Steel
   m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _METALLICGLOSSMAP
+  - _NORMALMAP
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -21,7 +23,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: b396c00b9f397644fbba445867f9e56d, type: 3}
+        m_Texture: {fileID: 2800000, guid: 274e5fcd8aa38b045983a86d8d7b7cbd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -41,11 +43,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 054e46d692563f74eb64a6e343e04366, type: 3}
+        m_Texture: {fileID: 2800000, guid: a3bddf6f8db175f4485152439ff500c9, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
-        m_Texture: {fileID: 2800000, guid: 8c5da5975a853c34faa2bb07542d0053, type: 3}
+        m_Texture: {fileID: 2800000, guid: 0f6bf33d00f2f2e419621a916d843fcc, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:

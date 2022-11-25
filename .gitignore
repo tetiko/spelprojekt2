@@ -11,6 +11,13 @@
 /[Mm]emoryCaptures/
 /[Uu]serSettings/
 
+<<<<<<< Updated upstream
+=======
+# Asset meta data should only be ignored when the corresponding asset is also ignored
+# !/[Aa]ssets/**/*.meta
+#/*.meta
+
+>>>>>>> Stashed changes
 # Uncomment this line if you wish to ignore the asset store tools plugin
 # /[Aa]ssets/AssetStoreTools*
 
@@ -60,3 +67,9 @@ crashlytics-build.properties
 
 UserSettings/Layouts/default-2021.dwlt
 UserSettings/EditorUserSettings.asset
+<<<<<<< Updated upstream
+=======
+UserSettings/EditorUserSettings.asset
+#*.meta
+Assets/Scenes/Main.unity.meta
+>>>>>>> Stashed changes
