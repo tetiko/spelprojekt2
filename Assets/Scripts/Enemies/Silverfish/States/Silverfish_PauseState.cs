@@ -51,6 +51,7 @@ public class Silverfish_PauseState : MasterState
             //Transition into the Patrolling State
             return Silverfish_PatrollingState;
         }
+
         //Transition to Attack State upon collision with player in Pause script
         else if (goTo_Silverfish_AttackState)
         {

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7434844269443057344}
   - component: {fileID: 7434844269443057346}
   - component: {fileID: 7434844269443057351}
+  - component: {fileID: -803443908085719729}
   m_Layer: 0
   m_Name: Spiderweb
   m_TagString: Untagged
@@ -97,3 +98,15 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-803443908085719729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7434844269443057356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7b9d95e772ccca499bf3edae033c514, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

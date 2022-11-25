@@ -5,16 +5,15 @@ TagManager:
   serializedVersion: 2
   tags:
   - Obstruction
-  - Enemy
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Action
+  - Enemies
   - Water
   - UI
   - Ground
-  - 
+  - Player
   - 
   - 
   - 

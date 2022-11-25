@@ -10,7 +10,7 @@ public class PlayerManager : MonoBehaviour
     PlayerController pcScript;
     ScreenShake shake;
 
-    public GameObject playerCamera;
+    [HideInInspector] public GameObject playerCamera;
 
     float resetMoveSpeed;
 
@@ -29,7 +29,6 @@ public class PlayerManager : MonoBehaviour
     public GameObject[] lives;
     int life;
    
-
     Material material;
 
     // Start is called before the first frame update
@@ -42,6 +41,8 @@ public class PlayerManager : MonoBehaviour
 
         //Set lives
         life = lives.Length;
+
+        AnimateLives();
     }
 
     public void PushPlayer(bool defaultPushForces, GameObject forceSource, float customXForce, float customYForce)
@@ -68,22 +69,22 @@ public class PlayerManager : MonoBehaviour
         
         //Get the direction of the player in relation to the enemy
         playerDir = (transform.position - forceSource.transform.position).normalized;
-        //Debug.Log("playerDir.x: " + playerDir.x);
+        //Debug.Log("playerDir: " + playerDir);
 
         //If Default Push Forces is true for this object
         if (defaultPushForces && pcScript.disableMovement == true && playerRb.velocity == Vector3.zero && enemyRb.isKinematic == true)
         {
             //Get the force power to apply
-            float xForce = playerDir.x * pcScript.impactForceX;
-            //Debug.Log("Default xForce: " + xForce);
-            playerRb.AddForce(xForce, pcScript.impactForceY, 0, ForceMode.Impulse);
+            Vector3 force = playerDir * pcScript.impactForceX;
+            //Debug.Log("Default force: " + force);
+            playerRb.AddForce(force.x, pcScript.impactForceY, force.z, ForceMode.Impulse);
         }
         //If Default Push Forces is false
         else if (!defaultPushForces && pcScript.disableMovement == true && playerRb.velocity == Vector3.zero)
         {
-            float xForce = playerDir.x * customXForce;
-            //Debug.Log("Custom xForce: " + xForce);
-            playerRb.AddForce(xForce, customYForce, 0, ForceMode.Impulse); 
+            Vector3 force = playerDir * customXForce;
+            //Debug.Log("Custom force: " + force);
+            playerRb.AddForce(force.x, customYForce, force.z, ForceMode.Impulse); 
         }
     }
 
@@ -97,8 +98,18 @@ public class PlayerManager : MonoBehaviour
         forceAdded = true;
     }
 
+    private void AnimateLives()
+    {
+
+        for (int i = 0; i < lives.Length; i++)
+        { 
+            //
+            lives[i].transform.DOScale(new Vector2(lives[i].transform.localScale.x * 0.92f, lives[i].transform.localScale.y * 0.92f), 0.6f).SetLoops(-1, LoopType.Yoyo);
+        }
+    }
+
     //If the player takes damage
-    public void PlayerTakesDamage(int dmg)
+    public void PlayerTakesDamage(int dmg, bool defaultPushForces, GameObject forceSource, float customXForce, float customYForce)
     {
         //If the player has 1 or more lives and is not invulnerable
         if (life >= 1 && !invulnerable)
@@ -107,6 +118,9 @@ public class PlayerManager : MonoBehaviour
             life -= dmg;
             //Destroy x amount of sprite representation(s) of a life
             Destroy(lives[life].gameObject);
+
+            //Push the player with forces provided by the source of the damage
+            PushPlayer(defaultPushForces, forceSource, customXForce, customYForce);
 
             //Shake the camera
             shake.Shake();
@@ -134,9 +148,16 @@ public class PlayerManager : MonoBehaviour
     {
         invulnerable = true;
 
+        //Disable collisions between the player and all enemies for the duration of the invulnerability
+        Physics.IgnoreLayerCollision(3, 7, true);
+        
         yield return new WaitForSeconds(time);
+
         //Turn off invulnurability
         invulnerable = false;
+
+        //Enable collisions again
+        Physics.IgnoreLayerCollision(3, 7, false);
     }
 
     public void GameOver()
@@ -210,6 +231,4 @@ public class PlayerManager : MonoBehaviour
             slippery = false;
         }
     }
-
-
 }
