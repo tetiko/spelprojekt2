@@ -9,7 +9,6 @@ public class Silverfish_Patrol : MonoBehaviour
 {   
     //Access external scripts
     AI_Silverfish vars;
-    Silverfish_PatrollingState silverfish_PatrollingState;
     PlayerManager playerManager;
     CanRotate canRotate;
 
@@ -21,7 +20,6 @@ public class Silverfish_Patrol : MonoBehaviour
     private void Awake()
     {
         vars = GetComponent<AI_Silverfish>();
-        silverfish_PatrollingState = GetComponentInChildren<Silverfish_PatrollingState>();
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
         canRotate = GetComponent<CanRotate>();
         animator = GetComponent<Animator>();
@@ -32,7 +30,7 @@ public class Silverfish_Patrol : MonoBehaviour
     {
         //Get the name of this action
         vars.currentAction = GetType();
-        Debug.Log("Class: " + GetType());
+        //Debug.Log("Class: " + GetType());
 
         //Reset animation triggerr
         animator.ResetTrigger("Tr_Turn");
@@ -80,10 +78,8 @@ public class Silverfish_Patrol : MonoBehaviour
 
             if (col.CompareTag("Player"))
             {
-                //Push the player
-                playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
                 //Deal damage
-                playerManager.PlayerTakesDamage(1);
+                playerManager.PlayerTakesDamage(1, vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
             }
 
             if (col.CompareTag("Obstruction") && !canRotate.rotate)
@@ -100,7 +96,4 @@ public class Silverfish_Patrol : MonoBehaviour
             }
         }
     } 
-
-
-
 }

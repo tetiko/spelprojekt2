@@ -101,10 +101,8 @@ public class Silverfish_ChaseAttack : MonoBehaviour
                 //Change direction and switch to patrol if the enemy is close to an obstruction to avoid hitting the player multiple times
                 if (dist < vars.obsTurnDist)
                 {
-                    //Push the player away
-                    playerManager.PushPlayer(false, gameObject, vars.impactForceX, vars.impactForceY);
                     //Deal damage
-                    playerManager.PlayerTakesDamage(1);
+                    playerManager.PlayerTakesDamage(1, false, gameObject, vars.impactForceX, vars.impactForceY);
                     //animator.ResetTrigger("Tr_Headbutt");
                     animator.ResetTrigger("Tr_Charge");
 
@@ -122,11 +120,10 @@ public class Silverfish_ChaseAttack : MonoBehaviour
                     StartCoroutine(StateTransitionToPatrol(0.05f));
                 }
                 else
-                {
-                    //Push the player away
-                    playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
+                {  
                     //Deal damage
-                    playerManager.PlayerTakesDamage(1);
+                    playerManager.PlayerTakesDamage(1, vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
+
                     //Switch to Pause state
                     silverfish_AttackState.goTo_Silverfish_PauseState = true;
                     //Debug.Log("ChaseAttack collision with Player");

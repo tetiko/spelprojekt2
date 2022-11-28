@@ -8,39 +8,56 @@ using System;
 
 public class PlayerDetectionOneDir : MonoBehaviour
 {
-   
+    //Access external scripts
+    PlayerManager playerManager;
+
     Vector3 enemyDir;
     public float aggroRange = 30f;
 
+    [Header("Set the player settings object")]
+    [SerializeField] GameObject playerObject;
     [Header("Set the eyes object")]
     public Transform eyes;
 
     [Header("Layers where enemy can detect objects")]
     public LayerMask detectionLayers;
 
+    private void Start()
+    {
+        playerManager = playerObject.GetComponent<PlayerManager>();
+    }
+
     private void Update()
     {
         //Move in the local direction of the transform. Important since we will be rotating the enemy on collision with obstructions
-        enemyDir = gameObject.transform.forward.normalized;
-        //Debug.Log("enemyDir: " + enemyDir);
+        enemyDir = gameObject.transform.forward;
+        Debug.Log("enemyDir: " + enemyDir);
     }
-    //Check to see if the enemy can spot the playqer within the specified range
+    //Check to see if the enemy can spot the player within the specified range
     public bool CanSeePlayer()
     {
         bool val = false;
         float castDist = aggroRange;
 
         //Check in which direction the enemy is looking, and set the direction for the linecast accordingly
-        if (enemyDir.x > 0)
+        if (enemyDir.x > 0 && enemyDir.z == 0)
         {
             castDist = aggroRange;
         }
-        else if (enemyDir.x < 0)
+        else if (enemyDir.x < 0 && enemyDir.z == 0)
+        {
+            castDist = -aggroRange;
+        }
+        else if (enemyDir.z > 0 && enemyDir.x == 0)
+        {
+            castDist = aggroRange;
+        }
+        else if (enemyDir.z < 0 && enemyDir.x == 0)
         {
             castDist = -aggroRange;
         }
 
-        Vector3 endPos = eyes.position + Vector3.right * castDist;
+        Vector3 endPos = eyes.position + enemyDir * castDist;
         //Vector3 endPos2 = eyes.position + new Vector3(0, 0, -0.05f) + Vector3.right * castDist;
         //Vector3 endPos3 = eyes.position + new Vector3(0, 0, 0.05f) + Vector3.right * castDist;
 
@@ -52,7 +69,7 @@ public class PlayerDetectionOneDir : MonoBehaviour
         //Physics.Linecast(eyes.position + hit2_Z, endPos2, out RaycastHit hit2, detectionLayers);
         //Physics.Linecast(eyes.position + hit3_Z, endPos3, out RaycastHit hit3, detectionLayers);
 
-        if (hit.collider != null)
+        if (hit.collider != null && !playerManager.invulnerable)
         { 
             //Debug.Log("Linecast hit something in the detectionLayers");
 
@@ -64,9 +81,8 @@ public class PlayerDetectionOneDir : MonoBehaviour
                 //Debug.Log("Linecast hit obstruction")
             }
 
-            //Check to see if we hit the player
-            if (hit.collider.gameObject.CompareTag("Player"))
-                
+            //Check to see if we hit the player and if it's invulnerable
+            if (hit.collider.gameObject.CompareTag("Player") && !playerManager.invulnerable)    
             {
                 //Onward !
                 val = true;
@@ -83,6 +99,11 @@ public class PlayerDetectionOneDir : MonoBehaviour
             Debug.DrawLine(eyes.position, hit.point, Color.red);
             //Debug.DrawLine(eyes.position + hit2_Z, hit.point, Color.red);
             //Debug.DrawLine(eyes.position + hit3_Z, hit.point, Color.red);
+        }
+        else if (hit.collider != null && playerManager.invulnerable)
+        {
+            //Draw a green line that represents the enemy being ignorant of the player during invulnerability
+            Debug.DrawLine(eyes.position, hit.point, Color.green);
         }
         else
         {

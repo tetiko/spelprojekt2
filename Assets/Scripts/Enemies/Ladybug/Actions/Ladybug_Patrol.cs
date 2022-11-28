@@ -13,8 +13,6 @@ public class Ladybug_Patrol : MonoBehaviour
     PlayerManager playerManager;
     CanRotate canRotate;
 
-    [HideInInspector] public bool disableEnemyMovement = false;
-
     //Variable for storing collisions with the player used in Patrolling_State
     [HideInInspector] public GameObject col = null;
 
@@ -26,7 +24,7 @@ public class Ladybug_Patrol : MonoBehaviour
         canRotate = GetComponent<CanRotate>();
     }
 
-    // OnEnable is called upon enabling a component
+    //OnEnable is called upon enabling a component
     void OnEnable()
     {
         //Get the name of this action
@@ -36,10 +34,7 @@ public class Ladybug_Patrol : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!disableEnemyMovement)
-        {
-            Patrolling();
-        }
+        Patrolling();
     }
 
     //Go about our usual patrolling business
@@ -52,6 +47,7 @@ public class Ladybug_Patrol : MonoBehaviour
     {
         if (vars.patrolEnable)
         {
+            //print("vars.patrolEnable: " + vars.patrolEnable);
             //Get the object we collided with
             col = collision.gameObject;
 
@@ -66,9 +62,9 @@ public class Ladybug_Patrol : MonoBehaviour
                 //Change direction and stay to patrol if the enemy is close to an obstruction to avoid hitting the player multiple times
                 if (dist < vars.obsTurnDist)
                 {
-                    Debug.Log("close to obstacle");
-                    //Push the player away
-                    playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
+                    //Debug.Log("close to obstacle");
+                    //Deal damage
+                    playerManager.PlayerTakesDamage(1, vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
                     //The enemy is struck with a sudden case of Amnesia
 
                     //Change direction upon collision with the player
@@ -77,37 +73,30 @@ public class Ladybug_Patrol : MonoBehaviour
                         canRotate.rotate = true;
                         canRotate.getTargetRotation = true;
                     }
-                } else
+                } 
+                else
                 {
-                    //Push the player away
-                    playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
-
+                    //Deal damage
+                    playerManager.PlayerTakesDamage(1, vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
                     //Switch to Pause state
                     patrollingState.ladybug_goToPauseState = true;
                     //Debug.Log("ChaseAttack collision with Player");
-                    //}
                 }
             }
 
-            if (col.CompareTag("Obstruction"))
+            if (col.CompareTag("Obstruction") && !canRotate.rotate)
             {
-                //Change direction upon collision with obstruction
-                DirChange(vars.enemyDir, vars.enemyRb);
+                //print("compare tag Obstruction");
+                //Play Turn animation
+                //if (animator != null)
+                //{
+                //    animator.SetTrigger("Tr_Turn");
+                //}
+
+                //Rotate the enemy
+                canRotate.rotate = true;
+                canRotate.getTargetRotation = true;
             }
         }
     }
-
-    //Change direction of the Rigidbody
-    public void DirChange(Vector3 enemyDir, Rigidbody enemyRb)
-    {
-        if (Mathf.Sign(enemyDir.x) > 0)
-        {
-            enemyRb.rotation = Quaternion.AngleAxis(180, Vector3.up);
-        }
-        else
-        {
-            enemyRb.rotation = Quaternion.AngleAxis(0, Vector3.up);
-        }
-    }
-
 }

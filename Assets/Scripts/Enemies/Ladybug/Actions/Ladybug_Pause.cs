@@ -22,7 +22,7 @@ public class Ladybug_Pause : MonoBehaviour
     {
         //Get the name of this action
         vars.currentAction = GetType();
-        Debug.Log("Class: " + GetType());
+        //Debug.Log("Class: " + GetType());
 
         //Go directly into the Pausing function
         Pausing();
@@ -30,6 +30,11 @@ public class Ladybug_Pause : MonoBehaviour
 
     public void Pausing()
     {
+        //if (animator != null)
+        //{
+        //    animator.SetTrigger("Tr_Pause");
+        //}
+
         //Pause, change direction and initiate state transition
         StartCoroutine(StateTransition(vars.pauseDuration));
     }
@@ -37,9 +42,7 @@ public class Ladybug_Pause : MonoBehaviour
     IEnumerator StateTransition(float time)
     {
         yield return new WaitForSeconds(time);
-        //Debug.Log("Dir change in coroutine");
-        //Change direction and...
-        //DirChange(vars.enemyDir, vars.enemyRb);
+        //Debug.Log("StateTransition");
 
         //... state transition
         pauseState.ladybug_goToPatrollingState = true;
@@ -52,24 +55,12 @@ public class Ladybug_Pause : MonoBehaviour
             //On collision with player
             if (collision.gameObject.CompareTag("Player"))
             {
-                //Push the player away
-                playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
+                print("COLLISION");
+                //Deal damage
+                playerManager.PlayerTakesDamage(1, vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
                 //Pause briefly after impact before we keep patrolling
-                Pausing();
+                //Pausing();
             }
-        }
-    }
-
-    //Change direction of the Rigidbody
-    public void DirChange(Vector3 enemyDir, Rigidbody enemyRb)
-    {
-        if (Mathf.Sign(enemyDir.x) > 0)
-        {
-            enemyRb.rotation = Quaternion.AngleAxis(180, Vector3.up);
-        }
-        else
-        {
-            enemyRb.rotation = Quaternion.AngleAxis(0, Vector3.up);
         }
     }
 }

@@ -22,15 +22,10 @@ public class ScreenShake : MonoBehaviour
     [SerializeField] bool fadeOut = true;
     //randomnessMode(default: Full) The type of randomness to apply, Full (fully random) or Harmonic(more balanced and visually more pleasant). 
     [SerializeField] ShakeRandomnessMode RandomnessMode;
- 
-    private void Start()
-    {
-    }
 
     public void Shake()
     {
         //DOShakePosition(float duration, float/Vector3 strength, int vibrato, float randomness, bool snapping, bool fadeOut, ShakeRandomnessMode randomnessMode);
         transform.DOShakePosition(duration, strength, vibrato, randomness, snapping, fadeOut, RandomnessMode);
-        print("shake");
     }
 }

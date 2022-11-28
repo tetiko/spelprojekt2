@@ -23,7 +23,6 @@ public class Silverfish_Pause : MonoBehaviour
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
         canRotate = GetComponent<CanRotate>();
         animator = GetComponent<Animator>();
-
     }
 
     // OnEnable is called upon enabling a component
@@ -78,8 +77,7 @@ public class Silverfish_Pause : MonoBehaviour
         else
         {
             silverfish_PauseState.goTo_Silverfish_AttackState = true;
-        }
-        
+        }  
     }
 
     public void OnCollisionEnter(Collision collision)
@@ -88,13 +86,9 @@ public class Silverfish_Pause : MonoBehaviour
         {
             //On collision with player
             if (collision.gameObject.CompareTag("Player"))
-            {
-                //Push the player away
-                playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
+            {          
                 //Deal damage
-                playerManager.PlayerTakesDamage(1);
-                //... initiate state transition to pause state
-                //silverfish_PauseState.goTo_Silverfish_AttackState = true;
+                playerManager.PlayerTakesDamage(1, vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
             }
         }
     }

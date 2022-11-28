@@ -33,7 +33,7 @@ public class AI_Ladybug : MonoBehaviour
     [HideInInspector] public GameObject enemyObject;
     [HideInInspector] public Rigidbody enemyRb;
 
-    //Enemy: Patrolling Aggro Settings
+    //Ladybug Settings
     [Header("Settings for this enemy")]
     public float moveSpeed = 10f;
     public float pauseDuration = 1f;

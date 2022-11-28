@@ -19,7 +19,6 @@ public class Silverfish_AttackState : MasterState
     PlayerManager playerManager;
     PlayerDetectionOneDir playerDetection;
 
-
     [HideInInspector] public bool goTo_Silverfish_PauseState = false;
     [HideInInspector] public bool goTo_Silverfish_PatrollingState = false;
 
@@ -35,7 +34,7 @@ public class Silverfish_AttackState : MasterState
     //Update function for the state machine
     public override MasterState RunCurrentState()
     {
-        playerDetection.CanSeePlayer();
+         playerDetection.CanSeePlayer();
 
         //Stop continious checks upon state switch
         if (vars.chaseAttackEnable == false)
@@ -57,7 +56,7 @@ public class Silverfish_AttackState : MasterState
             return silverfish_PauseState;
         }
         //Transition to Patrolling State upon collision with player in ChaseAttack script
-        else if (goTo_Silverfish_PatrollingState)
+        else if (goTo_Silverfish_PatrollingState || playerManager.invulnerable)
         {
             //Debug.Log("State switch: silverfish_PatrollingState");
             //Disable the ChaseAttack script
