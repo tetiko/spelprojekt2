@@ -42,7 +42,7 @@ public class Ladybug_Pause : MonoBehaviour
     IEnumerator StateTransition(float time)
     {
         yield return new WaitForSeconds(time);
-        Debug.Log("StateTransition");
+        //Debug.Log("StateTransition");
 
         //... state transition
         pauseState.ladybug_goToPatrollingState = true;
@@ -55,6 +55,7 @@ public class Ladybug_Pause : MonoBehaviour
             //On collision with player
             if (collision.gameObject.CompareTag("Player"))
             {
+                print("COLLISION");
                 //Deal damage
                 playerManager.PlayerTakesDamage(1, vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
                 //Pause briefly after impact before we keep patrolling

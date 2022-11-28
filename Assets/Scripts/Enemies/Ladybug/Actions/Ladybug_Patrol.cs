@@ -47,7 +47,7 @@ public class Ladybug_Patrol : MonoBehaviour
     {
         if (vars.patrolEnable)
         {
-            print("vars.patrolEnable: " + vars.patrolEnable);
+            //print("vars.patrolEnable: " + vars.patrolEnable);
             //Get the object we collided with
             col = collision.gameObject;
 
@@ -86,7 +86,7 @@ public class Ladybug_Patrol : MonoBehaviour
 
             if (col.CompareTag("Obstruction") && !canRotate.rotate)
             {
-                print("compare tag Obstruction");
+                //print("compare tag Obstruction");
                 //Play Turn animation
                 //if (animator != null)
                 //{

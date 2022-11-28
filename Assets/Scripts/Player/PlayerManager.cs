@@ -28,7 +28,8 @@ public class PlayerManager : MonoBehaviour
     public int invulnerableDuration = 3;
     public GameObject[] lives;
     int life;
-   
+    float lifeAniSpeed = 0.5f;
+
     Material material;
 
     // Start is called before the first frame update
@@ -43,6 +44,12 @@ public class PlayerManager : MonoBehaviour
         life = lives.Length;
 
         AnimateLives();
+    }
+
+    private void Update()
+    {
+        //Update lives
+        //life = lives.Length;
     }
 
     public void PushPlayer(bool defaultPushForces, GameObject forceSource, float customXForce, float customYForce)
@@ -100,11 +107,27 @@ public class PlayerManager : MonoBehaviour
 
     private void AnimateLives()
     {
+        //Adjust life sprites animation speed depending on number of lives
+        if (life >= 3)
+        {      
+            lifeAniSpeed = 0.6f;
+        }
+        else if (life == 2)
+        {
+            lifeAniSpeed = 0.4f;
+        }
+        else
+        {
+            lifeAniSpeed = 0.2f;
+        }
 
-        for (int i = 0; i < lives.Length; i++)
+        //Loop through the sprites and animate each one
+        for (int i = 0; i < life; i++)
         { 
-            //
-            lives[i].transform.DOScale(new Vector2(lives[i].transform.localScale.x * 0.92f, lives[i].transform.localScale.y * 0.92f), 0.6f).SetLoops(-1, LoopType.Yoyo);
+            if (lives[i] != null) 
+            { 
+                lives[i].transform.DOScale(new Vector2(lives[i].transform.localScale.x * 0.92f, lives[i].transform.localScale.y * 0.92f), lifeAniSpeed).SetLoops(-1, LoopType.Yoyo);
+            }
         }
     }
 
@@ -118,6 +141,7 @@ public class PlayerManager : MonoBehaviour
             life -= dmg;
             //Destroy x amount of sprite representation(s) of a life
             Destroy(lives[life].gameObject);
+            AnimateLives();
 
             //Push the player with forces provided by the source of the damage
             PushPlayer(defaultPushForces, forceSource, customXForce, customYForce);
