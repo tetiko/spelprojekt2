@@ -12,6 +12,7 @@ public class Silverfish_ChaseAttack : MonoBehaviour
     Silverfish_AttackState silverfish_AttackState;
     PlayerManager playerManager;
     CanRotate canRotate;
+    AttackAnimationTiming animationTiming;
 
     Animator animator;
 
@@ -20,9 +21,10 @@ public class Silverfish_ChaseAttack : MonoBehaviour
 
     float distToPlayer;
 
-    float lastPos;
-    float velocity;
-    float travelTime;
+    // Declare the lastPos and lastTime variables
+    Vector3 velocity;
+    Vector3 lastPos;
+    float lastTime;
 
     void Awake()
     {
@@ -31,6 +33,16 @@ public class Silverfish_ChaseAttack : MonoBehaviour
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
         canRotate = GetComponent<CanRotate>();
         animator = GetComponent<Animator>();
+    }
+
+    private void Start()
+    {
+        // Initialize the lastPos and lastTime variables to the current position and time
+        lastPos = vars.enemyRb.position;
+        lastTime = Time.time;
+
+        // Initialize the AttackAnimationTiming instance
+        animationTiming = new AttackAnimationTiming();
     }
 
     // OnEnable is called upon enabling a component
@@ -46,38 +58,25 @@ public class Silverfish_ChaseAttack : MonoBehaviour
         animator.ResetTrigger("Tr_Headbutt");
 
         //Play Charge animation
-        animator.SetTrigger("Tr_Charge");
-
-        //Start continious checks coroutine
-        StartCoroutine(ContiniousChecks());    
+        animator.SetTrigger("Tr_Charge");  
     }
 
-    void Update()
+    private void Update()
     {
-        distToPlayer = Vector3.Distance(vars.playerObject.transform.position, transform.position); 
+        EnemyVelocity();
+        AttackAnimations();
     }
 
     void FixedUpdate()
     {
         Attack();
-
-        velocity = (vars.enemyRb.position.x - lastPos) * 50;
-        lastPos = vars.enemyRb.position.x;
+        CheckRelativePlayerPos();
 
         //Debug.Log("velocity: " + velocity);
     }
 
     public void Attack()
     {
-        //Check if the headbutt animation is over
-        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Headbutt") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !animator.IsInTransition(0))
-        {
-            animator.ResetTrigger("Tr_Headbutt");
-            //Debug.Log("1 Headbutt animation loop over");
-            //Initiate charge animation
-            animator.SetTrigger("Tr_Charge");
-        }
-
         //Attack
         vars.enemyRb.MovePosition(vars.enemyRb.position + vars.enemyDir * Time.fixedDeltaTime * vars.chaseSpeed);
     }
@@ -160,38 +159,63 @@ public class Silverfish_ChaseAttack : MonoBehaviour
         //}
     }
 
-    public IEnumerator ContiniousChecks()
+    void AttackAnimations()
     {
-        while (true)
+        distToPlayer = Vector3.Distance(vars.playerObject.transform.position, transform.position);
+        //print("distToPlayer: " + distToPlayer);
+        //Create a new instance of the AttackAnimationTiming class
+
+        // Use the velocity of the enemy to calculate the start time of the attack animation
+        float animationStartTime = animationTiming.CalculateAnimationTiming(distToPlayer, velocity, vars.playerRb.velocity);
+
+        // Check if the attack animation should start
+        if (animationTiming.ShouldStartAnimation(animationStartTime))
         {
-            yield return new WaitForSeconds(0.1f);
+            animator.SetTrigger("Tr_Headbutt");
+        }
+        else
+        {
+            print("ShouldStartAnimation is false");
+        }
 
-            Vector3 playerPos = vars.playerObject.transform.position;
-            Vector3 forward = transform.TransformDirection(Vector3.forward);
-            Vector3 toPlayer = playerPos - transform.position;
+        //Check if the headbutt animation is over
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Headbutt") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !animator.IsInTransition(0))
+        {
+            animator.ResetTrigger("Tr_Headbutt");
+            //Debug.Log("1 Headbutt animation loop over");
+            //Initiate charge animation
+            animator.SetTrigger("Tr_Charge");
+        }
+    }
 
-            //Check if the player is behind us...
-            if (Vector3.Dot(forward, toPlayer) < 0)
-            {
-                //... if it is, go to patrolling state
-                silverfish_AttackState.goTo_Silverfish_PatrollingState = true;
-                //print("The player is behind me!");   
-            }
+    private void EnemyVelocity()
+    {
+        // Calculate the time that has elapsed since the last frame
+        float deltaTime = Time.deltaTime;
 
-            travelTime = Mathf.Abs(distToPlayer / (velocity - vars.playerRb.velocity.x));
-            //print("travelTime: " + travelTime);
+        // Calculate the distance the enemy has traveled since the last frame
+        Vector3 deltaDistance = vars.enemyRb.position - lastPos;
 
-            //Initiate Headbutt animation at the appropriate distance
-            if (travelTime < vars.headbuttStartDist)
-            {
+        // Calculate the velocity of the enemy
+        velocity = deltaDistance / deltaTime;
 
-                //SET MINIMUM DISTANCE
-                // Debug.Log("Headbutt");
+        // Update the lastPos and lastTime variables for the next frame
+        lastPos = vars.enemyRb.position;
+        lastTime = Time.time;
+    }
 
-                animator.SetTrigger("Tr_Headbutt");
-            }
+    private void CheckRelativePlayerPos()
+    {
+        Vector3 playerPos = vars.playerObject.transform.position;
+        Vector3 forward = transform.TransformDirection(Vector3.forward);
+        Vector3 toPlayer = playerPos - transform.position;
 
-
+        //Check if the player is behind us...
+        if (Vector3.Dot(forward, toPlayer) < 0)
+        {
+            //... if it is, go to patrolling state
+            silverfish_AttackState.goTo_Silverfish_PatrollingState = true;
+            //print("The player is behind me!");   
         }
     }
 }

@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class Woodlouse_ReactionState : MasterState
 {
     //The states that this state can transition into
-    public Woodlouse_AttackState woodlouse_AttackState;
+    public Woodlouse_AttackState Woodlouse_AttackState;
 
     //Access external scripts
     AI_Woodlouse vars;
@@ -16,9 +16,6 @@ public class Woodlouse_ReactionState : MasterState
     PlayerDetectionOneDir playerDetection;
 
     [HideInInspector] public bool goTo_Woodlouse_AttackState = false;
-
-    //Bool for making onStart() run only once per state inititation
-    //bool executed = false;
 
     void Awake()
     {
@@ -30,23 +27,18 @@ public class Woodlouse_ReactionState : MasterState
     //Update function for the state machine
     public override MasterState RunCurrentState()
     {
-        //Debug.Log("vars.reactEnable: " + vars.reactEnable);
-        //if (!executed)
-        //{
-            OnStart();
-        //}
-
-        //Reset the executed variable to only call OnStart() once
-        //if (vars.reactEnable == true)
-        //{
-        //    executed = true;
-        //}
-        //else
-        //{
-        //    executed = false;
-        //}
-
         playerDetection.CanSeePlayer();
+
+        //Check if the 'React' script is added to the object
+        if (react != null)
+        {
+            //Initiate the React effects
+            vars.reactEnable = true;
+        }
+        else
+        {
+            Debug.Log("Resolve issue: Add the 'React' script to " + vars.enemyObject);
+        }
 
         if (goTo_Woodlouse_AttackState)
         {
@@ -55,7 +47,7 @@ public class Woodlouse_ReactionState : MasterState
             //Reset state transition
             goTo_Woodlouse_AttackState = false;
             //Transition into the Attack State
-            return woodlouse_AttackState;
+            return Woodlouse_AttackState;
         }
         else
         {
@@ -64,17 +56,6 @@ public class Woodlouse_ReactionState : MasterState
         }
     }
    
-    void OnStart()
-    {
-        //Check if the 'React' script is added to the object
-        if (react != null)
-        {
-            //Initiate the React effects
-            vars.reactEnable = true;  
-        }
-        else
-        {
-            Debug.Log("Resolve issue: Add the 'React' script to " + vars.enemyObject);
-        }
-    }
+
+
 }

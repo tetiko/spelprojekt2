@@ -36,12 +36,6 @@ public class Silverfish_AttackState : MasterState
     {
          playerDetection.CanSeePlayer();
 
-        //Stop continious checks upon state switch
-        if (vars.chaseAttackEnable == false)
-        {
-            StopCoroutine(chaseAttack.ContiniousChecks());
-        }
-
         //Transition to Pause State upon collision with player in ChaseAttack script
         if (goTo_Silverfish_PauseState)
         {
@@ -49,7 +43,6 @@ public class Silverfish_AttackState : MasterState
 
             //Disable the ChaseAttack script
             vars.chaseAttackEnable = false;
-            StopCoroutine(chaseAttack.ContiniousChecks());
             //Reset state transition
             goTo_Silverfish_PauseState = false;
             //Transition to Pause State
@@ -61,7 +54,6 @@ public class Silverfish_AttackState : MasterState
             //Debug.Log("State switch: silverfish_PatrollingState");
             //Disable the ChaseAttack script
             vars.chaseAttackEnable = false;
-            StopCoroutine(chaseAttack.ContiniousChecks());
             //Reset state transition
             goTo_Silverfish_PatrollingState = false;
             

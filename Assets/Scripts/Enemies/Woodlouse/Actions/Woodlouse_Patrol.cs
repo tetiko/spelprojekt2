@@ -9,8 +9,10 @@ public class Woodlouse_Patrol : MonoBehaviour
 {   
     //Access external scripts
     AI_Woodlouse vars;
-    Woodlouse_PatrollingState woodlouse_PatrollingState;
     PlayerManager playerManager;
+    CanRotate canRotate;
+
+    Animator animator;
 
     //Variable for storing collisions with the player used in Patrolling_State
     [HideInInspector] public GameObject col = null;
@@ -18,8 +20,9 @@ public class Woodlouse_Patrol : MonoBehaviour
     private void Awake()
     {
         vars = GetComponent<AI_Woodlouse>();
-        woodlouse_PatrollingState = GetComponentInChildren<Woodlouse_PatrollingState>();
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
+        canRotate = GetComponent<CanRotate>();
+        animator = GetComponent<Animator>();
     }
 
     // OnEnable is called upon enabling a component
@@ -28,6 +31,22 @@ public class Woodlouse_Patrol : MonoBehaviour
         //Get the name of this action
         vars.currentAction = GetType();
         //Debug.Log("Class: " + GetType());
+
+        //Reset animation triggerr
+        //animator.ResetTrigger("Tr_Turn");
+        animator.ResetTrigger("Tr_Patrol");
+
+        //animator.ResetTrigger("Tr_Charge");
+        //animator.ResetTrigger("Tr_Headbutt");
+        //animator.ResetTrigger("Tr_crash");
+
+        //Play Patrol animation
+        animator.SetTrigger("Tr_Patrol");
+    }
+
+    void Update()
+    {
+        TurnAnimation();
     }
 
     void FixedUpdate()
@@ -38,55 +57,51 @@ public class Woodlouse_Patrol : MonoBehaviour
     //Go about our usual patrolling business
     public void Patrolling()
     {
+        //Debug.Log("vars.enemyRb.position: " + vars.enemyRb.position);
         vars.enemyRb.MovePosition(vars.enemyRb.position + vars.enemyDir * Time.fixedDeltaTime * vars.moveSpeed);
+    }
+
+    void TurnAnimation()
+    { 
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Turn") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !animator.IsInTransition(0))
+        {
+            //Debug.Log("1 Turn animation loop over");
+            animator.ResetTrigger("Tr_Patrol");
+
+            animator.SetTrigger("Tr_Patrol");
+        }
     }
 
     public void OnCollisionEnter(Collision collision)
     {
         if (vars.patrolEnable)
-        {
-            //Debug.Log("Patrol collision");
+        {   
             //Get the object we collided with
             col = collision.gameObject;
-            //Debug.Log("col: " + col);
 
             if (col.CompareTag("Player"))
             {
-                //StartCoroutine(PushAndWait(1f));
-                //Push the player and...
-                playerManager.PushPlayer(vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
-                //... initiate state transition to pause state
-                woodlouse_PatrollingState.goTo_Woodlouse_PauseState = true;
+                //Deal damage
+                playerManager.PlayerTakesDamage(1, vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
             }
 
-            if (col.CompareTag("Obstruction"))
+            if (col.CompareTag("Obstruction") && !canRotate.rotate && !animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Turn"))
             {
-                //Change direction upon collision with obstruction
-                DirChange(vars.enemyDir, vars.enemyRb);
+
+                //Play Turn animation
+                if (animator != null)
+                {
+
+                    print("turn check");
+                    animator.ResetTrigger("Tr_Turn");
+
+                    animator.SetTrigger("Tr_Turn");
+                }
+
+                //Rotate the enemy
+                canRotate.rotate = true;
+                canRotate.getTargetRotation = true;
             }
         }
-    }
-
-    //IEnumerator PushAndWait(float time)
-    //{
-    //    //Push the player away
-
-    //    yield return new WaitForSeconds(time);
-    //    //Change direction and...
-    //    DirChange(vars.enemyDir, vars.enemyRb);
-    //}
-
-    //Change direction of the Rigidbody
-    public void DirChange(Vector3 enemyDir, Rigidbody enemyRb)
-    {
-        if (Mathf.Sign(enemyDir.x) > 0)
-        {
-            enemyRb.rotation = Quaternion.AngleAxis(180, Vector3.up);
-        }
-        else
-        {
-            enemyRb.rotation = Quaternion.AngleAxis(0, Vector3.up);
-        }
-    }
-
+    } 
 }

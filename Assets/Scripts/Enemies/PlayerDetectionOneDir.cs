@@ -31,7 +31,7 @@ public class PlayerDetectionOneDir : MonoBehaviour
     {
         //Move in the local direction of the transform. Important since we will be rotating the enemy on collision with obstructions
         enemyDir = gameObject.transform.forward;
-        Debug.Log("enemyDir: " + enemyDir);
+        //Debug.Log("enemyDir: " + enemyDir);
     }
     //Check to see if the enemy can spot the player within the specified range
     public bool CanSeePlayer()

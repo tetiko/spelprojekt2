@@ -9,84 +9,88 @@ using static System.Collections.Specialized.BitVector32;
 public class Woodlouse_AttackState : MasterState
 {
     //The states that this state can transition into
-    public Woodlouse_PatrollingState woodlouse_PatrollingState;
-    public Woodlouse_PauseState woodlouse_PauseState;
+    //public Woodlouse_PatrollingState Woodlouse_PatrollingState;
+    public Woodlouse_CrashState Woodlouse_CrashState;
 
     //Access external scripts
     AI_Woodlouse vars;
-    PlayerDetectionOneDir playerDetection;
-    Woodlouse_RushAttack rushAttack;
+    Woodlouse_RollAttack rollAttack;
+    //CanRotate canRotate;
+    //PlayerManager playerManager;
+    //PlayerDetectionOneDir playerDetection;
 
-    [HideInInspector] public bool goTo_Woodlouse_PauseState = false, goTo_Woodlouse_PatrollingState = false;
+    [HideInInspector] public bool goTo_Woodlouse_CrashState = false;
+    //[HideInInspector] public bool goTo_Woodlouse_PatrollingState = false;
 
     void Awake()
     {
         vars = GetComponentInParent<AI_Woodlouse>();
-        rushAttack = GetComponentInParent<Woodlouse_RushAttack>();
-        playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
+        rollAttack = GetComponentInParent<Woodlouse_RollAttack>();
+        //canRotate = GetComponentInParent<CanRotate>();
+        //playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
+        //playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
     }
 
     //Update function for the state machine
     public override MasterState RunCurrentState()
     {
-        //Transition to Pause State upon collision with player in ChaseAttack script
-        if (goTo_Woodlouse_PauseState)
+        //Transition to Crash State upon collision with player in RollAttack script
+        if (goTo_Woodlouse_CrashState)
         {
-            //Disable the ChaseAttack script
-            vars.chaseAttackEnable = false;
-            //Reset state transition
-            goTo_Woodlouse_PauseState = false;
-            //Debug.Log("State switch: goTo_Woodlouse_PauseState!!!!!!!!!!!!!!!");
-            //Transition to Pause State
-            return woodlouse_PauseState;
-        }
-        //Transition to Patrolling State upon collision with player in ChaseAttack script
-        if (goTo_Woodlouse_PatrollingState)
-        {
-            //Debug.Log("State switch: woodlouse_PatrollingState!!!!!!!!!!!!!!!");
-            //Disable the ChaseAttack script
-            vars.chaseAttackEnable = false;
-            //Reset state transition
-            goTo_Woodlouse_PatrollingState = false;
-            //Transition to Patrolling State
-            return woodlouse_PatrollingState;
-        }
+            //Debug.Log("State switch: Woodlouse_CrashState");
 
-        //If we can see or remember the player
-        if (playerDetection.CanSeePlayer() || vars.hasMemory)
+            //Disable the RollAttack script
+            vars.rollAttackEnable = false;
+            //Reset state transition
+            goTo_Woodlouse_CrashState = false;
+            //Transition to crash State
+            return Woodlouse_CrashState;
+        }
+        //Transition to Patrolling State upon collision with player in RollAttack script
+        //else if (goTo_Woodlouse_PatrollingState)
+        //{
+        //    //Debug.Log("State switch: Woodlouse_PatrollingState");
+        //    //Disable the RollAttack script
+        //    vars.rollAttackEnable = false;
+        //    //Reset state transition
+        //    goTo_Woodlouse_PatrollingState = false;
+            
+        //    //Transition to Patrolling State
+        //    return Woodlouse_PatrollingState;
+        //}
+
+        //If the enemy finished rotating
+        else
         {
             //Stay in Attack state
-            InitiateAttack();
+            Attacking();
             return this;
         }
-        //If we remember the player (Memory timer starts during an enemy reaction in React.cs)
-        else if (vars.hasMemory)
+        //else
+        //{
+        //    //Disable the RollAttack script
+        //    vars.RollAttackEnable = false;
+        //    //Transition to Patrolling State
+        //    return Woodlouse_PatrollingState;
+        //}
+    }
+
+    void Attacking()
+    {
+        //Check if the 'Chase_Attack' script is added to the object
+        if (rollAttack != null)
         {
-            Debug.Log("Using memory in Attack State");
-            //Stay in Attack state if we remember the player
-            InitiateAttack();
-            return this;
+            //Initiate the attack
+            vars.rollAttackEnable = true;
+            //Move in the local direction of the transform
+            vars.enemyDir = transform.right;
         }
         else
         {
-            //Disable the ChaseAttack script
-            vars.chaseAttackEnable = false;
-            //Transition to Patrolling State
-            return woodlouse_PatrollingState;
+            Debug.Log("Resolve issue: Add the 'RollAttack' script to " + vars.enemyObject);
         }
     }
 
-    void InitiateAttack()
-    {
-        //Check if the 'Chase_Attack' script is added to the object
-        if (rushAttack != null)
-        {
-            //Initiate the attack
-            vars.chaseAttackEnable = true;
-        }
-        else
-        {
-            Debug.Log("Resolve issue: Add the 'ChaseAttack' script to " + vars.enemyObject);
-        }
-    }
+
 }
+ 

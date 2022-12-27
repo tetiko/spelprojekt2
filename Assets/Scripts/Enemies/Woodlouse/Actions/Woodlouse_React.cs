@@ -7,12 +7,16 @@ public class Woodlouse_React : MonoBehaviour
 {
     //Access external scripts
     AI_Woodlouse vars;
-    Woodlouse_ReactionState woodlouse_ReactionState;
+    Woodlouse_ReactionState Woodlouse_ReactionState;
+    PlayerManager playerManager;
 
+    Animator animator;
     private void Awake()
     {
         vars = GetComponent<AI_Woodlouse>();
-        woodlouse_ReactionState = GetComponentInChildren<Woodlouse_ReactionState>();
+        Woodlouse_ReactionState = GetComponentInChildren<Woodlouse_ReactionState>();
+        playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
+        animator = GetComponent<Animator>();
     }
 
     // OnEnable is called upon enabling a component
@@ -20,33 +24,46 @@ public class Woodlouse_React : MonoBehaviour
     {
         //Get the name of this action
         vars.currentAction = GetType();
-        Debug.Log("Class: " + GetType());
+        //Debug.Log("Class: " + GetType());
 
-        //Go directly into the Reacting functionq
-        Reacting(gameObject);
+        //Go directly into the Reacting function
+        Reacting();
     }
 
-    public void Reacting(GameObject enemyType)
+    public void Reacting()
     {
         //Debug.Log("enemyType: " + enemyType.tag);
-        //Memorize the player for a set amount of time using the EnemyMemory script
-        vars.hasMemory = true;
 
-        if (enemyType.tag == "Jump Reaction")
-        {
-            //Debug.Log("Jump Reaction");
-            //React with a surprise jump
-            vars.enemyRb.AddForce(Vector3.up * vars.jumpReactionForce, ForceMode.Impulse);
+        //Play React animation
+        //if (animator != null)
+        //{
+        animator.ResetTrigger("Tr_React");
 
-            //Wait for the reaction to play out before chasing
-            StartCoroutine(StateTransition(0.5f));
-        }
+        animator.SetTrigger("Tr_React");
+        //}
+
+        StartCoroutine(StateTransition(vars.reactDuration));
     }
 
     IEnumerator StateTransition(float time)
     {
         yield return new WaitForSeconds(time);
-        //state transition
-        woodlouse_ReactionState.goTo_Woodlouse_AttackState = true;
+        //State transition to attack state
+        Woodlouse_ReactionState.goTo_Woodlouse_AttackState = true;
+    }
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        if (vars.reactEnable)
+        {
+            //On collision with player
+            if (collision.gameObject.CompareTag("Player"))
+            {
+                //Deal damage
+                playerManager.PlayerTakesDamage(1, vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
+                //... initiate state transition to crash state
+                Woodlouse_ReactionState.goTo_Woodlouse_AttackState = true;
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@ public class RotateCamera : MonoBehaviour
     [SerializeField] GameObject playerCamera;
     [SerializeField] GameObject player;
 
-    bool rotateCamera = false;
+    //bool rotateCamera = false;
 
     [Header("Camera Rotation 1")]
     Vector3 newRotation;
@@ -21,11 +21,10 @@ public class RotateCamera : MonoBehaviour
 
     [SerializeField] RotateMode rotateMode;
 
-    public enum rotations // your custom enumeration
+    public enum rotations
     {
         RotateRight,
         RotateLeft,
-
     }
 
     //private void Update()
@@ -54,12 +53,6 @@ public class RotateCamera : MonoBehaviour
             //newPosition = new Vector3(playerCamera.transform.position.x - 6.3f, playerCamera.transform.position.y, 0);
 
             player.transform.DORotate(newRotation, transitionSpeed, rotateMode).SetEase(Ease.OutQuint);
-            //playerCamera.transform.rotation = newRotation;
-            //player.transform.localRotation = newRotation;
-            //playerCamera.transform.position = newPosition;
-
-            //playerCamera.transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, transitionSpeed * Time.deltaTime);
-            //playerCamera.transform.position = Vector3.Slerp(playerCamera.transform.position, newPosition, transitionSpeed * Time.deltaTime);
         }
     }
 }
