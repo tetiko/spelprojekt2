@@ -45,7 +45,7 @@ public class Woodlouse_Crash : MonoBehaviour
 
     void Update()
     {
-        StateTransition();
+        AnimationLoopChecks();
     }
 
     void Crash()
@@ -57,7 +57,7 @@ public class Woodlouse_Crash : MonoBehaviour
         animator.SetTrigger("Tr_Crash");
     }
 
-    void StateTransition()
+    void AnimationLoopChecks()
     {
         //StartCoroutine(CrashAndStateTransition());
         //Wait for crash animation to finish
@@ -66,7 +66,12 @@ public class Woodlouse_Crash : MonoBehaviour
             //Transition to patrolling state
             //Debug.Log("Crash animation loop over");
             Woodlouse_CrashState.goTo_Woodlouse_PatrollingState = true;
-
+        }
+        //Wait for the death animation to finish
+        else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Death") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1)
+        {
+            //Destroy the enemy
+            Destroy(gameObject);
         }
     }
 
@@ -154,6 +159,10 @@ public class Woodlouse_Crash : MonoBehaviour
                     {
                         animator.ResetTrigger("Tr_Death");
                         animator.SetTrigger("Tr_Death");
+
+                        vars.playerRb.AddForce(0, 10, 0, ForceMode.Impulse);
+
+
 
                         print("collision is up");
                     }
