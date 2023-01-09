@@ -83,7 +83,7 @@ public class Woodlouse_AttackState : MasterState
             //Initiate the attack
             vars.rollAttackEnable = true;
             //Move in the local direction of the transform
-            vars.enemyDir = transform.right;
+            //vars.enemyDir = transform.right;
         }
         else
         {

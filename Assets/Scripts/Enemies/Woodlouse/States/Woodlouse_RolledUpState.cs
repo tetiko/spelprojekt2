@@ -5,50 +5,46 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Woodlouse_ReactionState : MasterState
+public class Woodlouse_RolledUpState : MasterState
 {
     //The states that this state can transition into
-    public Woodlouse_AttackState Woodlouse_AttackState;
+    public Woodlouse_PatrollingState Woodlouse_PatrollingState;
 
     //Access external scripts
     AI_Woodlouse vars;
-    Woodlouse_React react;
-    PlayerDetectionOneDir playerDetection;
+    Woodlouse_RollUp rollUp;
 
-    [HideInInspector] public bool goTo_Woodlouse_AttackState = false;
+    [HideInInspector] public bool goTo_Woodlouse_PatrollingState = false;
 
     void Awake()
     {
         vars = GetComponentInParent<AI_Woodlouse>();
-        react = GetComponentInParent<Woodlouse_React>();
-        playerDetection = GetComponentInParent<PlayerDetectionOneDir>();
+        rollUp = GetComponentInParent<Woodlouse_RollUp>();
     }
 
     //Update function for the state machine
     public override MasterState RunCurrentState()
     {
-        playerDetection.CanSeePlayer();
-
-        if (goTo_Woodlouse_AttackState)
+        if (goTo_Woodlouse_PatrollingState)
         {
             //Disable the React script
             vars.reactEnable = false;
             //Reset state transition
-            goTo_Woodlouse_AttackState = false;
+            goTo_Woodlouse_PatrollingState = false;
             //Transition into the Attack State
-            return Woodlouse_AttackState;
+            return Woodlouse_PatrollingState;
         }
         else
         {
             //Check if the 'React' script is added to the object
-            if (react != null)
+            if (rollUp != null)
             {
                 //Initiate the React effects
-                vars.reactEnable = true;
+                vars.rollUpEnable = true;
             }
             else
             {
-                Debug.Log("Resolve issue: Add the 'React' script to " + vars.enemyObject);
+                Debug.Log("Resolve issue: Add the 'RollUp' script to " + vars.enemyObject);
             }
 
             //Stay in Reaction State

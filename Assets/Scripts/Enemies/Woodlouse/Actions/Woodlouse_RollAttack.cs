@@ -20,6 +20,8 @@ public class Woodlouse_RollAttack : MonoBehaviour
     [HideInInspector] public GameObject col = null;
     [HideInInspector] public GameObject col2 = null;
 
+    //Bool for storing what we collided with
+    public bool obsCol = false;
 
     void Awake()
     {
@@ -29,54 +31,56 @@ public class Woodlouse_RollAttack : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    private void Start()
-    {
-        // Initialize the lastPos and lastTime variables to the current position and time
-        //lastPos = vars.enemyRb.position;
-        //lastTime = Time.time;
-
-        // Initialize the AttackAnimationTiming instance
-        //animationTiming = new AttackAnimationTiming();
-    }
-
     // OnEnable is called upon enabling a component
     void OnEnable()
-     {
-        //Get the name of this action
-        vars.currentAction = GetType();
+    {
+        //Get and set the this action
+        vars.setAction = GetType();
+        vars.currentAction = vars.setAction;
         //Debug.Log("Class: " + GetType());
 
-        //animator.ResetTrigger("Tr_crash");
-        animator.ResetTrigger("Tr_Attack_Start");
-
-        //Play Charge animation
-        animator.SetTrigger("Tr_Attack_Start");  
+        StartCoroutine(InitiateAttack());
     }
 
     private void Update()
     {
-        //EnemyVelocity();
-        AttackAnimations();
+        //AttackAnimations();
     }
 
     void FixedUpdate()
     {
-        Attack();
-        //CheckRelativePlayerPos();
-
-        //Debug.Log("velocity: " + velocity);
+        RollAttack();
     }
 
-    public void Attack()
+    IEnumerator InitiateAttack()
+    {     
+        //Start attack animation
+        animator.ResetTrigger("Tr_Attack_Start");
+        animator.SetTrigger("Tr_Attack_Start");
+
+        yield return new WaitForSeconds(0.5f);
+
+        //Jump forward
+        vars.enemyRb.AddForce(vars.enemyDir.x * vars.attackStartForceX, vars.attackStartForceY, 0, ForceMode.Impulse);
+
+        yield return new WaitForSeconds(0.2f);
+
+        animator.ResetTrigger("Tr_Attack_Roll");
+        animator.SetTrigger("Tr_Attack_Roll");
+
+        StopCoroutine(InitiateAttack());
+    }
+
+    void RollAttack()
     {
-        //Attack
+        //Rollin'
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.AttackRoll"))
         {
-            vars.enemyRb.MovePosition(vars.enemyRb.position + vars.enemyDir * Time.fixedDeltaTime * vars.chaseSpeed);
+            vars.enemyRb.MovePosition(vars.enemyRb.position + vars.enemyDir * Time.fixedDeltaTime * vars.rollSpeed);
         }
     }
 
-    public void OnCollisionEnter(Collision collision)
+    void OnCollisionEnter(Collision collision)
     {  
         if (vars.rollAttackEnable)
         {
@@ -86,8 +90,7 @@ public class Woodlouse_RollAttack : MonoBehaviour
 
             if (col.CompareTag("Obstruction"))
             {
-               
-
+                obsCol = true;
                 Woodlouse_AttackState.goTo_Woodlouse_CrashState = true;
             }
            
@@ -131,10 +134,8 @@ public class Woodlouse_RollAttack : MonoBehaviour
                 //else
                 //{  
 
-
                 //Deal damage
                 playerManager.PlayerTakesDamage(1, vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
-
                 Woodlouse_AttackState.goTo_Woodlouse_CrashState = true;
 
                 //Switch to crash state
@@ -142,35 +143,28 @@ public class Woodlouse_RollAttack : MonoBehaviour
                 //Debug.Log("RollAttack collision with Player");
                 //}
             }
-
         }
     }
 
-    //IEnumerator StateTransitionToPatrol(float time)
+    //void AttackAnimations()
     //{
-    //    yield return new WaitForSeconds(time);
-    //    //State transition
-    //    //if (!playerDetection.CanSeePlayer() && !canRotate.rotate) 
-    //    //{
-    //        Woodlouse_AttackState.goTo_Woodlouse_PatrollingState = true;
-    //    //}
+    //    //Check if the Attack_Start animation is over
+    //    if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.AttackStart") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1)
+    //    {
+    //        //Debug.Log("1 Attack_Start animation loop over");
+
+    //        //StartCoroutine(WaitForAttackJump(1));
+
+    //    }
     //}
 
-    void AttackAnimations()
-    {
+    //IEnumerator WaitForAttackJump(float time)
+    //{
+    //    yield return new WaitForSeconds(time);
 
-        //Check if the Attack_Start animation is over
-        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.AttackStart") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.75)
-        {
-            //Debug.Log("1 Attack_Start animation loop over");
-
-            //Initiate attack animation
-            animator.ResetTrigger("Tr_Attack_Roll");
-
-            animator.SetTrigger("Tr_Attack_Roll");
-            
-        }
-    }
+    //    //Initiate roll animation
+  
+    //}
 
     //private void EnemyVelocity()
     //{

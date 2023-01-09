@@ -21,7 +21,7 @@ public class PlayerManager : MonoBehaviour
     [HideInInspector] public bool forceAdded = false;
     [HideInInspector] public bool slippery = false;
     [HideInInspector] public bool glide = false;
-    public bool invulnerable = false;
+    [HideInInspector] public bool invulnerable = false;
     [HideInInspector] public bool bouncing = false;
     [HideInInspector] public bool gameOver = false;
 
@@ -32,14 +32,23 @@ public class PlayerManager : MonoBehaviour
 
     Material material;
 
+    [Header("Object References")]
+    [SerializeField] GameObject woodlouseObject;
+    AI_Woodlouse woodlouseScript;
+
+    bool disableCollider = false;
+
+    void Awake()
+    {
+        pcScript = GetComponent<PlayerController>();
+        shake = playerCamera.GetComponent<ScreenShake>();
+        playerRb = GetComponent<Rigidbody>();
+        material = GetComponent<Renderer>().material;
+        woodlouseScript = woodlouseObject.GetComponent<AI_Woodlouse>();
+    }
     // Start is called before the first frame update
     void Start()
     {
-        pcScript = GetComponent<PlayerController>();
-        playerRb = GetComponent<Rigidbody>();
-        material = GetComponent<Renderer>().material;
-        shake = playerCamera.GetComponent<ScreenShake>();
-
         //Set lives
         life = lives.Length;
 
@@ -194,6 +203,7 @@ public class PlayerManager : MonoBehaviour
     {
         GameObject colObject = collision.gameObject;
         LayerMask colMask = collision.gameObject.layer;
+        Collider collider = collision.collider;
 
         //Enable movement again after the player lands again or collides with an obstruction
         if (forceAdded && colObject.CompareTag("Obstruction") || forceAdded && colMask == LayerMask.NameToLayer("Ground"))
@@ -205,6 +215,49 @@ public class PlayerManager : MonoBehaviour
             bouncing = false;
             //Debug.Log("Landed after push");
         }
+
+        //Do some enemy collider detections from here instead of from the enemy to circument restrictive Unity nonsense
+        //of not being able to check which of an object's colliders was hit from a parent object in 3D. 
+
+        //If the player collides with the enemy from above
+        if (colObject == woodlouseObject && collider == woodlouseScript.topCollider && !disableCollider)
+        {
+            //Woodlouse collisions:
+
+            disableCollider = false;
+
+            //if the enemy has crashed
+            if (woodlouseScript.crashEnable)
+            {
+                //Kill the enemy
+                woodlouseScript.animator.ResetTrigger("Tr_Death");
+                woodlouseScript.animator.SetTrigger("Tr_Death");
+                //Apply an impulse force to the player
+                playerRb.AddForce(0, 6, 0, ForceMode.Impulse);
+
+                disableCollider = false;
+            }
+
+            //If the enemy is in Patrol or react state
+            else if (woodlouseScript.patrolEnable || woodlouseScript.reactEnable)
+            {
+                //Play roll up animation in the Woodlouse_RollUp script     
+                woodlouseScript.curlUp = true;
+                disableCollider = false;
+            }
+             
+            print("Collision came from above");
+        }
+
+        else if (colObject == woodlouseObject && collider == woodlouseScript.sideCollider && !disableCollider)
+        {
+            disableCollider = true;
+            PlayerTakesDamage(1, woodlouseScript.defaultPushForces, colObject, woodlouseScript.impactForceX, woodlouseScript.impactForceY);
+            disableCollider = false;
+            print("Collision came from the sides");
+        }
+
+        
     }
 
     //Interactables and hazards affecting the player

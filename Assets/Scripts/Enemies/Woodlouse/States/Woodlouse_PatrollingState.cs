@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class Woodlouse_PatrollingState : MasterState
 {
     //The states that this state can transition into
-    //public Woodlouse_CrashState Woodlouse_CrashState;
+    public Woodlouse_RolledUpState Woodlouse_RolledUpState;
     public Woodlouse_ReactionState Woodlouse_ReactionState;
 
     //Access external scripts
@@ -18,7 +18,7 @@ public class Woodlouse_PatrollingState : MasterState
     PlayerDetectionOneDir playerDetection;
     CanRotate canRotate;
 
-    [HideInInspector] public bool goTo_Woodlouse_CrashState = false;
+    [HideInInspector] public bool goTo_Woodlouse_RolledUpState = false;
 
     private void Awake()
     {
@@ -40,16 +40,16 @@ public class Woodlouse_PatrollingState : MasterState
             //Transition to Reaction state since we have no memory of the player
             return Woodlouse_ReactionState;
         }
-        //Transition to crash upon collision with player in Patrol script
-        //else if (goTo_Woodlouse_CrashState)
-        //{
-        //    //Disable the Patrol script
-        //    vars.patrolEnable = false;
-        //    //Reset the transition bool
-        //    goTo_Woodlouse_CrashState = false;
-        //    //Transition to crash State
-        //    return Woodlouse_CrashState;
-        //}
+        //Transition to Rolled Up state
+        else if (goTo_Woodlouse_RolledUpState)
+        {
+            //Disable the Patrol script
+            vars.patrolEnable = false;
+            //Reset the transition bool
+            goTo_Woodlouse_RolledUpState = false;
+            //Transition to crash State
+            return Woodlouse_RolledUpState;
+        }
         else
         {
             //Check if the 'crash' script is added to the object

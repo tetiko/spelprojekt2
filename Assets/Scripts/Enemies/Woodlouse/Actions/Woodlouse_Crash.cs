@@ -10,33 +10,31 @@ public class Woodlouse_Crash : MonoBehaviour
     //Access external scripts
     AI_Woodlouse vars;
     Woodlouse_CrashState Woodlouse_CrashState;
+    Woodlouse_RollAttack woodlouse_Rollattack;
     PlayerManager playerManager;
     CanRotate canRotate;
 
     Animator animator;
-    Animator parentAnimator;
+    Animation anim;
 
-    Type previousAction;
-
-    private void Awake()
+    void Awake()
     {
         vars = GetComponent<AI_Woodlouse>();
         Woodlouse_CrashState = GetComponentInChildren<Woodlouse_CrashState>();
+        woodlouse_Rollattack = GetComponent<Woodlouse_RollAttack>();
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
         canRotate = GetComponent<CanRotate>();
-
         animator = GetComponent<Animator>();
-        
     }
 
     // OnEnable is called upon enabling a component
     void OnEnable()
     {
-        parentAnimator = vars.enemyObject.GetComponent<Animator>();
         //Get the previous action
-        previousAction = vars.currentAction;
-        //Get the name of this action
-        vars.currentAction = GetType();
+        //previousAction = vars.currentAction;
+        //Get and set the this action
+        vars.setAction = GetType();
+        vars.currentAction = vars.setAction;
         //Debug.Log("Class: " + GetType());
 
         //Go directly into the Crash function
@@ -45,35 +43,82 @@ public class Woodlouse_Crash : MonoBehaviour
 
     void Update()
     {
+        //print("In crash ability");
         AnimationLoopChecks();
     }
 
     void Crash()
     {
-        //Rotate the parent holding the enemy bone structure
-        //vars.bonesObject.transform.rotation = Quaternion.LookRotation(transform.forward, Vector3.up);
-        //Play crash animation
         animator.ResetTrigger("Tr_Crash");
+        //Play crash animation
         animator.SetTrigger("Tr_Crash");
     }
 
     void AnimationLoopChecks()
     {
-        //StartCoroutine(CrashAndStateTransition());
+        //AnimatorClipInfo[] clipInfo = animator.GetCurrentAnimatorClipInfo(0);
+        //string stateName = clipInfo[0].clip.name;
+        //Debug.Log("Current animator state: " + stateName);
+
+        //StartCoroutine(CrashAnimation());
+
         //Wait for crash animation to finish
-        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Crash") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1)
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Crash") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.95)
         {
+            //print("Animation time: " + animator.GetCurrentAnimatorStateInfo(0).normalizedTime);
+            //Rotate the transform
+
+            //Rotate if we the crash was the result av collided with an obstruction
+            if (woodlouse_Rollattack.obsCol)
+            {
+                Vector3 rotate = new Vector3(0, transform.eulerAngles.y - 180, 0);
+                transform.eulerAngles = rotate;
+                woodlouse_Rollattack.obsCol = false;
+            }
+
+            //Adjust the enemy's position to make room for the turn animation to trigger upon collision with obstructions
+            vars.enemyTransform.position = new Vector3(vars.enemyTransform.position.x + (0.2f * -vars.enemyDir.x), vars.enemyTransform.position.y);
+
             //Transition to patrolling state
-            //Debug.Log("Crash animation loop over");
             Woodlouse_CrashState.goTo_Woodlouse_PatrollingState = true;
+            vars.crashEnable = false;
         }
         //Wait for the death animation to finish
-        else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Death") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1)
+        else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Death") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !animator.IsInTransition(0))
         {
             //Destroy the enemy
             Destroy(gameObject);
         }
     }
+
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    if (vars.crashEnable)
+    //    {
+    //        //If we collided with the player
+    //        if (collision.gameObject.CompareTag("Obstruction"))
+    //        {
+                   //COLLISION SET IN PLAYER MANAGER
+    //        }
+    //    }
+    //}
+
+    //IEnumerator CrashAnimation()
+    //{
+    //    if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Crash"))
+    //    {
+    //        //print("Animation length: " + animator.GetCurrentAnimatorStateInfo(0).length);
+
+    //        //print("Animation time: " + animator.GetCurrentAnimatorStateInfo(0).normalizedTime);
+
+    //        //Wait for crash animation to finish
+    //        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
+
+    //        //Transition to patrolling state
+    //        //Debug.Log("Crash animation loop over");
+
+    //    }
+    //}
 
     //IEnumerator CrashAndStateTransition()
     //{
@@ -124,55 +169,4 @@ public class Woodlouse_Crash : MonoBehaviour
     //    }  
     //}
 
-    public void OnCollisionEnter(Collision collision)
-    {
-        if (vars.crashEnable)
-        {
-            //On collision with player
-            if (collision.gameObject.CompareTag("Player"))
-            {
-                // Get the direction of the collision
-                Vector3 direction = transform.position - collision.gameObject.transform.position;
-
-                Debug.Log("Mathf.Abs(direction.y): " + Mathf.Abs(direction.y));
-
-                // Check if the collision comes from the sides
-                if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
-                {
-                    if (direction.x > 0)
-                    {
-                        playerManager.PlayerTakesDamage(1, vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
-
-                        print("collision is to the right");
-                    }
-                    else
-                    {
-                        playerManager.PlayerTakesDamage(1, vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
-
-                        print("collision is to the left");
-                    }
-                }
-                else
-                {
-                    //Check if the player jumped on the enemy's belly
-                    if (direction.y < 0)
-                    {
-                        animator.ResetTrigger("Tr_Death");
-                        animator.SetTrigger("Tr_Death");
-
-                        vars.playerRb.AddForce(0, 10, 0, ForceMode.Impulse);
-
-
-
-                        print("collision is up");
-                    }
-                    else
-                    {
-                        print("collision is down");
-                    }
-
-                }
-            }
-        }
-    }
 }

@@ -1,14 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEngine;
 
 //Gives the enemy the ability to patrol between obstacles (and chosen parameters (coming soon))
 
 public class Woodlouse_Patrol : MonoBehaviour
-{   
+{
     //Access external scripts
     AI_Woodlouse vars;
+    Woodlouse_PatrollingState Woodlouse_PatrollingState;
     PlayerManager playerManager;
     CanRotate canRotate;
 
@@ -21,6 +23,7 @@ public class Woodlouse_Patrol : MonoBehaviour
     {
         vars = GetComponent<AI_Woodlouse>();
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
+        Woodlouse_PatrollingState = GetComponentInChildren<Woodlouse_PatrollingState>();
         canRotate = GetComponent<CanRotate>();
         animator = GetComponent<Animator>();
     }
@@ -28,25 +31,20 @@ public class Woodlouse_Patrol : MonoBehaviour
     // OnEnable is called upon enabling a component
     void OnEnable()
     {
-        //Get the name of this action
-        vars.currentAction = GetType();
+        //Get and set the this action
+        vars.setAction = GetType();
+        vars.currentAction = vars.setAction;
         //Debug.Log("Class: " + GetType());
 
-        //Reset animation triggerr
-        //animator.ResetTrigger("Tr_Turn");
-        animator.ResetTrigger("Tr_Patrol");
-
-        //animator.ResetTrigger("Tr_Charge");
-        //animator.ResetTrigger("Tr_Headbutt");
-        //animator.ResetTrigger("Tr_crash");
-
         //Play Patrol animation
-        animator.SetTrigger("Tr_Patrol");
+        animator.ResetTrigger("Tr_Patrol");
+        animator.SetTrigger("Tr_Patrol");      
     }
 
     void Update()
     {
-        TurnAnimation();
+        AnimationLoopChecks();
+        StateTransition();
     }
 
     void FixedUpdate()
@@ -57,17 +55,31 @@ public class Woodlouse_Patrol : MonoBehaviour
     //Go about our usual patrolling business
     public void Patrolling()
     {
-        //Debug.Log("vars.enemyRb.position: " + vars.enemyRb.position);
-        vars.enemyRb.MovePosition(vars.enemyRb.position + vars.enemyDir * Time.fixedDeltaTime * vars.moveSpeed);
+        //Move the enemy if not curled up
+        //if(!vars.curledUp)
+        //{ 
+            //Debug.Log("vars.enemyRb.position: " + vars.enemyRb.position);
+            vars.enemyRb.MovePosition(vars.enemyRb.position + vars.enemyDir * Time.fixedDeltaTime * vars.moveSpeed);
+        //}
     }
 
-    void TurnAnimation()
-    { 
+    private void StateTransition()
+    {
+
+        if (vars.curlUp == true)
+        {
+            Woodlouse_PatrollingState.goTo_Woodlouse_RolledUpState = true;
+            vars.curlUp = false;
+        }
+    }
+
+    void AnimationLoopChecks()
+    {
+        //Wait for turn animation to finish
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Turn") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !animator.IsInTransition(0))
         {
             //Debug.Log("1 Turn animation loop over");
             animator.ResetTrigger("Tr_Patrol");
-
             animator.SetTrigger("Tr_Patrol");
         }
     }
@@ -75,7 +87,7 @@ public class Woodlouse_Patrol : MonoBehaviour
     public void OnCollisionEnter(Collision collision)
     {
         if (vars.patrolEnable)
-        {   
+        {
             //Get the object we collided with
             col = collision.gameObject;
 
@@ -87,21 +99,16 @@ public class Woodlouse_Patrol : MonoBehaviour
 
             if (col.CompareTag("Obstruction") && !canRotate.rotate && !animator.GetCurrentAnimatorStateInfo(0).IsName("Base.Turn"))
             {
+                //print("turn check");
+                animator.ResetTrigger("Tr_Turn");
 
-                //Play Turn animation
-                if (animator != null)
-                {
-
-                    print("turn check");
-                    animator.ResetTrigger("Tr_Turn");
-
-                    animator.SetTrigger("Tr_Turn");
-                }
+                animator.SetTrigger("Tr_Turn");
 
                 //Rotate the enemy
                 canRotate.rotate = true;
                 canRotate.getTargetRotation = true;
             }
+
         }
-    } 
+    }
 }

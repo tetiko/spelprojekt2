@@ -26,16 +26,6 @@ public class Woodlouse_CrashState : MasterState
     //Update function for the state machine
     public override MasterState RunCurrentState()
     {
-        //Check if the 'crash' script is added to the object
-        if (crash != null)
-        {
-            //Initiate the crash effects
-            vars.crashEnable = true;
-        }
-        else
-        {
-            Debug.Log("Resolve issue: Add the 'Woodlouse_Crash' script to " + vars.enemyObject);
-        }
 
         //Debug.Log("StateTransition to Patrolling: " + StateTransition());
         if (goTo_Woodlouse_PatrollingState)
@@ -60,6 +50,17 @@ public class Woodlouse_CrashState : MasterState
         //}
         else
         {
+            //Check if the 'crash' script is added to the object
+            if (crash != null)
+            {
+                //Initiate the crash effects
+                vars.crashEnable = true;
+            }
+            else
+            {
+                Debug.Log("Resolve issue: Add the 'Woodlouse_Crash' script to " + vars.enemyObject);
+            }
+
             //Stay in crash State
             return this;
         }

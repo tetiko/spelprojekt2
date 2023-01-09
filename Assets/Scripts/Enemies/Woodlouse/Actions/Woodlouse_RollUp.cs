@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class Woodlouse_React : MonoBehaviour
+public class Woodlouse_RollUp : MonoBehaviour
 {
     //Access external scripts
     AI_Woodlouse vars;
-    Woodlouse_ReactionState Woodlouse_ReactionState;
+    Woodlouse_RolledUpState Woodlouse_RolledUpState;
     PlayerManager playerManager;
 
     Animator animator;
@@ -15,7 +15,7 @@ public class Woodlouse_React : MonoBehaviour
     void Awake()
     {
         vars = GetComponent<AI_Woodlouse>();
-        Woodlouse_ReactionState = GetComponentInChildren<Woodlouse_ReactionState>();
+        Woodlouse_RolledUpState = GetComponentInChildren<Woodlouse_RolledUpState>();
         playerManager = vars.playerObject.GetComponentInChildren<PlayerManager>();
         animator = GetComponent<Animator>();
     }
@@ -29,45 +29,53 @@ public class Woodlouse_React : MonoBehaviour
         //Debug.Log("Class: " + GetType());
 
         //Go directly into the Reacting function
-        Reacting();
+        RollUp();
 
         //Reset the curled up bool for the Roll up animatíon
         //vars.curledUp = false;
     }
 
-    public void Reacting()
+    private void Update()
+    {
+        AnimationLoopChecks();
+    }
+
+    public void RollUp()
     {
         //Debug.Log("enemyType: " + enemyType.tag);
 
-        //Play React animation
-        //if (animator != null)
-        //{
-        animator.ResetTrigger("Tr_React");
+        //Play the roll up animation
+        animator.ResetTrigger("Tr_Roll_Up");
+        animator.SetTrigger("Tr_Roll_Up");
 
-        animator.SetTrigger("Tr_React");
-        //}
-
-        StartCoroutine(StateTransition(vars.reactDuration));
     }
 
-    IEnumerator StateTransition(float time)
+    void AnimationLoopChecks()
     {
-        yield return new WaitForSeconds(time);
-        //State transition to attack state
-        Woodlouse_ReactionState.goTo_Woodlouse_AttackState = true;
+        //Wait for the RollOut animation to finish
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.RollOut") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.95)
+        {
+            Woodlouse_RolledUpState.goTo_Woodlouse_PatrollingState = true;
+        }
     }
+
+    //IEnumerator StateTransition(float time)
+    //{
+    //    yield return new WaitForSeconds(time);
+    //    //State transition to patrolling state
+    //    Woodlouse_RolledUpState.goTo_Woodlouse_PatrollingState = true;
+    //}
 
     public void OnCollisionEnter(Collision collision)
     {
-        if (vars.reactEnable)
+        if (vars.rollUpEnable)
         {
             //On collision with player
             if (collision.gameObject.CompareTag("Player"))
             {
                 //Deal damage
                 playerManager.PlayerTakesDamage(1, vars.defaultPushForces, gameObject, vars.impactForceX, vars.impactForceY);
-                //... initiate state transition to crash state
-                Woodlouse_ReactionState.goTo_Woodlouse_AttackState = true;
+                print("Collision when rolled up");
             }
         }
     }
